@@ -7,13 +7,13 @@ import (
 
 //Token is
 type Token struct {
-	tipo    int8 // 0-  1D 2ruta 3id 4ruta 5->
+	tipo    int8 // 0-  1D 2ruta 3id 4ruta 5->   6 EOF
 	lexema  string
 	linea   int16
 	columna int16
 }
 
-//Funcion analizadora
+//Scanner is
 func Scanner(cadena string) []Token {
 	estado := 0
 	var tokens []Token
@@ -36,13 +36,16 @@ func Scanner(cadena string) []Token {
 			} else if (cadena[i] == 95) || (cadena[i] == 47) || (cadena[i] > 64 && cadena[i] < 91) || (cadena[i] > 96 && cadena[i] < 123) { //   letra, _ o /
 				tok += string(cadena[i])
 				estado = 4
+			} else if cadena[i] == 35 {
+				tok += string(cadena[i])
+				estado = 3
 			} else if cadena[i] == 10 {
 				l++
 				j = 0
 			} else if cadena[i] != 9 {
 				if cadena[i] != 32 {
 					if (i == len(cadena)-1) && (cadena[i] == 63) {
-						return tokens
+						tokens = append(tokens, crearToken(string(cadena[i]), l, j, 6)) //EOF
 					} else {
 						imprimirError(string(cadena[i]), l, j)
 					}
@@ -80,10 +83,10 @@ func Scanner(cadena string) []Token {
 			tok += string(cadena[i])
 			estado = 5
 			if cadena[i] == 10 || cadena[i] == 9 {
+				imprimirError(tok, l, j)
 				estado = 0
 				i--
 				tok = ""
-				fmt.Println("Error lexico: " + tok + " en la linea " + string(l) + " columna " + string(j))
 			}
 		case 4:
 			if cadena[i] == 46 {
@@ -110,7 +113,7 @@ func Scanner(cadena string) []Token {
 		case 5:
 			if cadena[i] == 10 {
 				if tok[0] != 35 {
-					fmt.Println("Error Lexico: " + tok + " en la linea " + string(l) + " columna " + string(j))
+					imprimirError(tok, l, j)
 				}
 				tok = ""
 				estado = 0
@@ -119,7 +122,7 @@ func Scanner(cadena string) []Token {
 				if tok[0] == 34 {
 					tokens = append(tokens, crearToken(tok+"\"", l, j, 2))
 				} else {
-					fmt.Println("Error Lexico: " + tok + " en la linea " + string(l) + " columna " + string(j))
+					imprimirError(tok, l, j)
 				}
 				tok = ""
 				estado = 0
@@ -142,7 +145,6 @@ func crearToken(lex string, lin int16, col int16, tipo int8) Token {
 }
 
 func imprimirError(tok string, l, j int16) {
-	fmt.Print(tok)
 	fmt.Print("Error Lexico: " + tok + " en la linea ")
 	fmt.Print(l)
 	fmt.Print(" columna ")

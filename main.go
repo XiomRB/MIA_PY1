@@ -2,13 +2,12 @@ package main
 
 import (
 	"Archivos/PY1/Analizador"
-	"fmt"
 )
 
 func main() {
-	var tokens []Analizador.Token = Analizador.Scanner("der8/as/si.dsk\"/comida/t.dsk\" 888 -989 -mkdisk -> -> -988 ->9875 ->-esded")
-	fmt.Println(len(tokens))
+	/*var tokens []Analizador.Token = Analizador.Scanner("mkdir -name -> arroba.dsk")
 	for i := 0; i < len(tokens); i++ {
 		fmt.Println(tokens[i])
-	}
+	}*/
+	Analizador.Parser("mkdir -name -> arroba.dsk\n#comentario para probar\nmkdisk    -path ->  \"mi disco/disco 1.dsk\"\n exec")
 }
