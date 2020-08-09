@@ -1,21 +1,14 @@
 package main
 
 import (
+	"Archivos/PY1/Analizador"
 	"fmt"
 )
 
 func main() {
-	saludo := `	 
-	`
-	fmt.Println(saludo[0])
-	fmt.Println(saludo[1])
-	fmt.Println(saludo[2])
-	fin := ""
-	if saludo[0] == 76 {
-		fin = fin + string(saludo[0])
-	} else {
-		fin = "no coincidio"
+	var tokens []Analizador.Token = Analizador.Scanner("der8/as/si.dsk\"/comida/t.dsk\" 888 -989 -mkdisk -> -> -988 ->9875 ->-esded")
+	fmt.Println(len(tokens))
+	for i := 0; i < len(tokens); i++ {
+		fmt.Println(tokens[i])
 	}
-
-	fmt.Println(fin)
 }

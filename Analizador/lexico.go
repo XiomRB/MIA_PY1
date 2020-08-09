@@ -13,10 +13,12 @@ type Token struct {
 	columna int16
 }
 
-func scanner(cadena string) []Token {
+//Funcion analizadora
+func Scanner(cadena string) []Token {
 	estado := 0
 	var tokens []Token
 	var tok string
+	cadena += "?"
 	var l int16 = 0 //linea
 	var j int16 = 0 //columna
 	for i := 0; i < len(cadena); i++ {
@@ -37,11 +39,17 @@ func scanner(cadena string) []Token {
 			} else if cadena[i] == 10 {
 				l++
 				j = 0
-			} else if (cadena[i] != 9) || (cadena[i] != 32) {
-				fmt.Println("Error Lexico: " + string(cadena[i]) + " en la linea " + string(l) + " columna " + string(j))
+			} else if cadena[i] != 9 {
+				if cadena[i] != 32 {
+					if (i == len(cadena)-1) && (cadena[i] == 63) {
+						return tokens
+					} else {
+						imprimirError(string(cadena[i]), l, j)
+					}
+				}
 			}
 		case 1:
-			if cadena[i] > 47 && cadena[i] < 58 {
+			if cadena[i] > 47 && cadena[i] < 58 { //digit
 				estado = 2
 				tok += string(cadena[i])
 			} else {
@@ -56,10 +64,12 @@ func scanner(cadena string) []Token {
 				}
 			}
 		case 2:
-			tok += string(cadena[i])
 			if (cadena[i] == 95) || (cadena[i] == 47) || (cadena[i] > 64 && cadena[i] < 91) || (cadena[i] > 96 && cadena[i] < 123) {
+				tok += string(cadena[i])
 				estado = 4
-			} else if cadena[i] < 47 || cadena[i] > 57 { //digit{
+			} else if cadena[i] > 47 && cadena[i] < 58 { //digit{
+				tok += string(cadena[i])
+			} else {
 				tokens = append(tokens, crearToken(tok, l, j, 1))
 				i--
 				j--
@@ -76,10 +86,11 @@ func scanner(cadena string) []Token {
 				fmt.Println("Error lexico: " + tok + " en la linea " + string(l) + " columna " + string(j))
 			}
 		case 4:
-			tok += string(cadena[i])
 			if cadena[i] == 46 {
 				if strings.Compare("dsk", string([]byte{cadena[i+1], cadena[i+2], cadena[i+3]})) == 0 {
-					tokens = append(tokens, crearToken(tok, l, j, 4))
+					tokens = append(tokens, crearToken(tok+".dsk", l, j, 4))
+					i += 4
+					j += 4
 				} else {
 					tokens = append(tokens, crearToken(tok, l, j, 3))
 				}
@@ -87,7 +98,9 @@ func scanner(cadena string) []Token {
 				i--
 				j--
 				estado = 0
-			} else if (cadena[i] > 0 && cadena[i] < 47) || (cadena[i] > 57 && cadena[i] < 65) || (cadena[i] > 90 && cadena[i] < 95) || (cadena[i] > 122) || cadena[i] == 96 {
+			} else if (cadena[i] == 95) || (cadena[i] > 46 && cadena[i] < 58) || (cadena[i] > 64 && cadena[i] < 91) || (cadena[i] > 96 && cadena[i] < 123) { //   letra, _ o /
+				tok += string(cadena[i])
+			} else {
 				tokens = append(tokens, crearToken(tok, l, j, 3))
 				tok = ""
 				i--
@@ -95,7 +108,6 @@ func scanner(cadena string) []Token {
 				estado = 0
 			}
 		case 5:
-			tok += string(cadena[i])
 			if cadena[i] == 10 {
 				if tok[0] != 35 {
 					fmt.Println("Error Lexico: " + tok + " en la linea " + string(l) + " columna " + string(j))
@@ -105,14 +117,14 @@ func scanner(cadena string) []Token {
 				i--
 			} else if cadena[i] == 34 {
 				if tok[0] == 34 {
-					tokens = append(tokens, crearToken(tok, l, j, 2))
+					tokens = append(tokens, crearToken(tok+"\"", l, j, 2))
 				} else {
 					fmt.Println("Error Lexico: " + tok + " en la linea " + string(l) + " columna " + string(j))
 				}
 				tok = ""
 				estado = 0
-				i--
-				j--
+			} else {
+				tok += string(cadena[i])
 			}
 		}
 		j++
@@ -127,4 +139,12 @@ func crearToken(lex string, lin int16, col int16, tipo int8) Token {
 	t.columna = col
 	t.tipo = tipo
 	return t
+}
+
+func imprimirError(tok string, l, j int16) {
+	fmt.Print(tok)
+	fmt.Print("Error Lexico: " + tok + " en la linea ")
+	fmt.Print(l)
+	fmt.Print(" columna ")
+	fmt.Println(j)
 }
