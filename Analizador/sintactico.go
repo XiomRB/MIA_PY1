@@ -2,96 +2,129 @@ package Analizador
 
 import "fmt"
 
+var error bool
+var preanalisis Token
+var numpreanalisis int
+var tokens []Token
+
 //Parser is
-func Parser(cadena string) {
-	tokens := Scanner(cadena)
-	numpreanalisis := 0
+func Parser(cadena string) Nodo {
+	tokens = Scanner(cadena)
+	numpreanalisis = 0
+	error = false
 	if len(tokens) != 0 {
-		preanalisis := tokens[0]
-		lc(preanalisis, tokens, numpreanalisis)
+		preanalisis = tokens[0]
+		raiz := CrearNodo("RAIZ", -2, 0, 0)
+		raiz.hijos = lc()
+		return raiz
 	}
+	return CrearNodo("", -1, 0, 0)
 }
 
-func com(preanalisis Token, tokens []Token, numpreanalisis int) int {
+func com() Nodo {
+	nuevo := CrearNodo("COMANDO", -1, 0, 0)
 	if preanalisis.tipo == 3 {
-		numpreanalisis = match(3, preanalisis, numpreanalisis)
-		return lp(tokens[numpreanalisis], tokens, numpreanalisis)
+		nuevo = match(3, 0) //COMANDO
+		nuevo.hijos = lp()
 	} else {
-		imprimirErrorSint(preanalisis, 0)
-		return numpreanalisis
+		imprimirErrorSint(3)
 	}
+	return nuevo
 }
 
-func lcom(preanalisis Token, tokens []Token, numpreanalisis int) int {
+func lcom() []Nodo {
+	var lista []Nodo
 	if preanalisis.tipo == 3 {
-		numpreanalisis = com(preanalisis, tokens, numpreanalisis)
-		return lcom(tokens[numpreanalisis], tokens, numpreanalisis)
+		lista = append(lista, com())
+		lista1 := lcom()
+		if len(lista1) != 0 {
+			for i := 0; i < len(lista1); i++ {
+				lista = append(lista, lista1[i])
+			}
+		}
 	}
-	return numpreanalisis
+	return lista
 }
 
-func lc(preanalisis Token, tokens []Token, numpreanalisis int) int {
+func lc() []Nodo {
+	var lista []Nodo
 	if preanalisis.tipo == 3 {
-		numpreanalisis = com(preanalisis, tokens, numpreanalisis)
-		return lcom(tokens[numpreanalisis], tokens, numpreanalisis)
+		lista = append(lista, com())
+		lista1 := lcom()
+		if len(lista1) != 0 {
+			for i := 0; i < len(lista1); i++ {
+				lista = append(lista, lista1[i])
+			}
+		}
 	} else {
-		imprimirErrorSint(preanalisis, 0)
-		return numpreanalisis
+		imprimirErrorSint(3)
 	}
+	return lista
 }
 
-func param(preanalisis Token, tokens []Token, numpreanalisis int) int {
+func param() Nodo {
+	nuevo := CrearNodo("PARAMETRO", -1, preanalisis.linea, preanalisis.columna)
 	if preanalisis.tipo == 0 {
-		numpreanalisis = match(0, preanalisis, numpreanalisis)
-		numpreanalisis = match(3, tokens[numpreanalisis], numpreanalisis)
-		numpreanalisis = match(5, tokens[numpreanalisis], numpreanalisis)
-		return p(tokens[numpreanalisis], tokens, numpreanalisis)
+		match(0, 0)
+		nuevo = match(3, 5) //5 parametro
+		match(5, 5)
+		nuevo.hijos = append(nuevo.hijos, p())
 	} else {
-		imprimirErrorSint(preanalisis, 0)
-		return numpreanalisis
+		imprimirErrorSint(0)
 	}
+	return nuevo
 }
 
-func lp(preanalisis Token, tokens []Token, numpreanalisis int) int {
+func lp() []Nodo {
+	var lista []Nodo
 	if preanalisis.tipo == 0 {
-		numpreanalisis = param(tokens[numpreanalisis], tokens, numpreanalisis)
-		return lp(tokens[numpreanalisis], tokens, numpreanalisis)
+		lista = append(lista, param())
+		lista1 := lp()
+		if len(lista1) != 0 {
+			for i := 0; i < len(lista1); i++ {
+				lista = append(lista, lista1[i])
+			}
+		}
 	}
-	return numpreanalisis
+	return lista
 }
 
-func p(preanalisis Token, tokens []Token, numpreanalisis int) int {
+func p() Nodo {
+	nuevo := CrearNodo(preanalisis.lexema, preanalisis.tipo, preanalisis.linea, preanalisis.columna)
 	switch preanalisis.tipo {
 	case 1:
-		return match(1, preanalisis, numpreanalisis) //numero
+		match(1, 1) //numero
 	case 2:
-		return match(2, preanalisis, numpreanalisis) //cadena
+		match(2, 2) //cadena
 	case 3:
-		return match(3, preanalisis, numpreanalisis) //id
+		match(3, 3) //id
 	case 4:
-		return match(4, preanalisis, numpreanalisis) //ruta
+		match(4, 4) //ruta
 	default:
-		imprimirErrorSint(tokens[numpreanalisis], preanalisis.tipo)
-		return numpreanalisis
+		imprimirErrorSint(3)
 	}
+	return nuevo
 }
 
-func match(tipo int8, preanalisis Token, numpreanalisis int) int {
+func match(tipo, t int8) Nodo {
+	nuevo := CrearNodo(preanalisis.lexema, t, preanalisis.linea, preanalisis.columna)
 	if tipo != preanalisis.tipo {
-		imprimirErrorSint(preanalisis, tipo)
+		imprimirErrorSint(tipo)
 	} else {
 		if preanalisis.tipo != 6 {
 			numpreanalisis++
+			preanalisis = tokens[numpreanalisis]
 		}
 	}
-	return numpreanalisis
+	return nuevo
 }
 
-func imprimirErrorSint(t Token, tipo int8) {
+func imprimirErrorSint(tipo int8) {
+	error = true
 	fmt.Print("Error Sintactico: Se esperaba" + obtenerTipo(tipo) + " linea ")
-	fmt.Print(t.linea)
+	fmt.Print(preanalisis.linea)
 	fmt.Print(" columna ")
-	fmt.Println(t.columna)
+	fmt.Println(preanalisis.columna)
 }
 
 func obtenerTipo(t int8) string {
