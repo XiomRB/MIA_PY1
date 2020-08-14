@@ -1,8 +1,8 @@
-package Analizador
+package analizador
 
 import "fmt"
 
-var error bool
+var Error bool
 var preanalisis Token
 var numpreanalisis int
 var tokens []Token
@@ -11,11 +11,11 @@ var tokens []Token
 func Parser(cadena string) Nodo {
 	tokens = Scanner(cadena)
 	numpreanalisis = 0
-	error = false
+	Error = false
 	if len(tokens) != 0 {
 		preanalisis = tokens[0]
 		raiz := CrearNodo("RAIZ", -2, 0, 0)
-		raiz.hijos = lc()
+		raiz.Hijos = lc()
 		return raiz
 	}
 	return CrearNodo("", -1, 0, 0)
@@ -25,7 +25,7 @@ func com() Nodo {
 	nuevo := CrearNodo("COMANDO", -1, 0, 0)
 	if preanalisis.tipo == 3 {
 		nuevo = match(3, 0) //COMANDO
-		nuevo.hijos = lp()
+		nuevo.Hijos = lp()
 	} else {
 		imprimirErrorSint(3)
 	}
@@ -68,7 +68,7 @@ func param() Nodo {
 		match(0, 0)
 		nuevo = match(3, 5) //5 parametro
 		match(5, 5)
-		nuevo.hijos = append(nuevo.hijos, p())
+		nuevo.Hijos = append(nuevo.Hijos, p())
 	} else {
 		imprimirErrorSint(0)
 	}
@@ -120,7 +120,7 @@ func match(tipo, t int8) Nodo {
 }
 
 func imprimirErrorSint(tipo int8) {
-	error = true
+	Error = true
 	fmt.Print("Error Sintactico: Se esperaba" + obtenerTipo(tipo) + " linea ")
 	fmt.Print(preanalisis.linea)
 	fmt.Print(" columna ")

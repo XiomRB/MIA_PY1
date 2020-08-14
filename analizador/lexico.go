@@ -1,4 +1,4 @@
-package Analizador
+package analizador
 
 import (
 	"fmt"
@@ -33,9 +33,12 @@ func Scanner(cadena string) []Token {
 			} else if cadena[i] == 34 { // "
 				estado = 3
 				tok += string(cadena[i])
-			} else if (cadena[i] == 95) || (cadena[i] == 47) || (cadena[i] > 64 && cadena[i] < 91) || (cadena[i] > 96 && cadena[i] < 123) { //   letra, _ o /
+			} else if (cadena[i] == 95) || (cadena[i] > 64 && cadena[i] < 91) || (cadena[i] > 96 && cadena[i] < 123) { //   letra, _ o /
 				tok += string(cadena[i])
 				estado = 4
+			} else if cadena[i] == 47 { // /
+				estado = 6
+				tok += string(cadena[i])
 			} else if cadena[i] == 35 {
 				tok += string(cadena[i])
 				estado = 3
@@ -94,6 +97,10 @@ func Scanner(cadena string) []Token {
 					tokens = append(tokens, crearToken(tok+".dsk", l, j, 4))
 					i += 4
 					j += 4
+				} else if strings.Compare("mia", string([]byte{cadena[i+1], cadena[i+2], cadena[i+3]})) == 0 {
+					tokens = append(tokens, crearToken(tok+".mia", l, j, 4))
+					i += 4
+					j += 4
 				} else {
 					tokens = append(tokens, crearToken(tok, l, j, 3))
 				}
@@ -128,6 +135,14 @@ func Scanner(cadena string) []Token {
 				estado = 0
 			} else {
 				tok += string(cadena[i])
+			}
+		case 6:
+			if cadena[i] == 42 { // *
+				estado = 0
+				tok = ""
+			} else if (cadena[i] == 95) || (cadena[i] > 64 && cadena[i] < 91) || (cadena[i] > 96 && cadena[i] < 123) || (cadena[i] > 47 && cadena[i] < 58) {
+				tok += string(cadena[i])
+				estado = 4
 			}
 		}
 		j++
