@@ -9,8 +9,8 @@ import (
 type Token struct {
 	tipo    int8 // 0-  1D 2ruta 3id 4ruta 5->   6 EOF
 	lexema  string
-	linea   int16
-	columna int16
+	linea   int
+	columna int
 }
 
 //Scanner is
@@ -19,8 +19,8 @@ func Scanner(cadena string) []Token {
 	var tokens []Token
 	var tok string
 	cadena += "?"
-	var l int16 = 0 //linea
-	var j int16 = 0 //columna
+	l := 0 //linea
+	j := 0 //columna
 	for i := 0; i < len(cadena); i++ {
 		switch estado {
 		case 0:
@@ -150,7 +150,7 @@ func Scanner(cadena string) []Token {
 	return tokens
 }
 
-func crearToken(lex string, lin int16, col int16, tipo int8) Token {
+func crearToken(lex string, lin int, col int, tipo int8) Token {
 	var t Token
 	t.lexema = lex
 	t.linea = lin
@@ -159,7 +159,7 @@ func crearToken(lex string, lin int16, col int16, tipo int8) Token {
 	return t
 }
 
-func imprimirError(tok string, l, j int16) {
+func imprimirError(tok string, l, j int) {
 	fmt.Print("Error Lexico: " + tok + " en la linea ")
 	fmt.Print(l)
 	fmt.Print(" columna ")

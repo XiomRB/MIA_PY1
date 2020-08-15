@@ -3,16 +3,15 @@ package comandos
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"os"
-	"os/user"
-	"strings"
 	"time"
 )
 
 //Mkdisk info del comando mkdisk
 type Mkdisk struct {
-	Size int64
+	Size int
 	Path string
 	Name string
 	Unit string
@@ -20,7 +19,7 @@ type Mkdisk struct {
 
 //CrearDisco llamado para mkdisk
 func CrearDisco(param Mkdisk) string {
-	path := unirPath(param.Path, param.Name)
+	path := param.Path + param.Name
 	file, err := os.Open(path)
 	if err != nil {
 		file, err = os.Create(path)
@@ -44,7 +43,7 @@ func CrearDisco(param Mkdisk) string {
 		var binario bytes.Buffer
 		binary.Write(&binario, binary.BigEndian, &cero)
 		EscribirBytes(file, binario.Bytes())
-		file.Seek(disco.Size-1, 0)
+		file.Seek(int64(disco.Size-1), 0)
 		var binario2 bytes.Buffer
 		binary.Write(&binario2, binary.BigEndian, &cero)
 		EscribirBytes(file, binario2.Bytes())
@@ -52,23 +51,20 @@ func CrearDisco(param Mkdisk) string {
 		var binario3 bytes.Buffer
 		binary.Write(&binario3, binary.BigEndian, &disco)
 		EscribirBytes(file, binario3.Bytes())
-		return "Disco creado"
-	} else {
 		file.Close()
-		return "Error: El disco ya existe"
+		return "Disco creado"
 	}
+	file.Close()
+	return "Error: El disco ya existe"
 }
 
-func unirPath(p, n string) string { //-----------------------BORRAR--------------------------
-	pp := ""
-	if p[0] == 34 {
-		r := []rune(p)
-		pp = string(r[0 : len(r)-1])
-		pp += n + "\""
+func eliminarDisco(path string, l int) {
+	err := os.Remove(path)
+	if err != nil {
+		fmt.Println("Error: El disco no existe --Linea: ", l)
 	} else {
-		pp = p + n
+		fmt.Println("Disco borrado exitosamente")
 	}
-	return pp
 }
 
 //CrearCarpeta funcion para crear directorios en caso no existen
@@ -86,23 +82,4 @@ func EscribirBytes(file *os.File, bytes []byte) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func HomePath(path string) string {
-	lista := strings.Split(path, "/")
-	u, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if lista[1] == "home" {
-		path = u.HomeDir + "/"
-		for i := 2; i < len(lista)-1; i++ {
-			path += lista[i] + "/"
-		}
-	}
-	return path
-}
-
-func CrearMKDISK() {
-
 }

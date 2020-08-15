@@ -2,7 +2,7 @@ package comandos
 
 //MBR para crear Disco
 type MBR struct {
-	Size        int64
+	Size        int
 	Creacion    [30]rune
 	Indice      int
 	Particiones [4]Particion
