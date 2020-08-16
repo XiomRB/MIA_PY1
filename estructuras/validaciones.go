@@ -1,4 +1,4 @@
-package comandos
+package estructuras
 
 import (
 	"fmt"

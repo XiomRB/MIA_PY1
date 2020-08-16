@@ -1,15 +1,19 @@
 package main
 
-import "Archivos/PY1/comandos"
+import (
+	"fmt"
+	"unsafe"
+)
 
 func main() {
 	/*
-		var raiz analizador.Nodo
-		raiz = analizador.Parser("mkdir -name -> arroba.dsk\n#comentario para probar\nmkdisk /*\n   -path ->  \"mi disco/disco 1.dsk\"\n exec")
-		analizador.ImprimirArbol(raiz)*/
-	//var disco comandos.MBR
-	Path := "exec -path->/home/gabriela/Documentos/entrada.mia"
+			var raiz analizador.Nodo
+			raiz = analizador.Parser("mkdir -name -> arroba.dsk\n#comentario para probar\nmkdisk /*\n   -path ->  \"mi disco/disco 1.dsk\"\n exec")
+			analizador.ImprimirArbol(raiz)
+		//var disco comandos.MBR
+		Path := "exec -path->/home/gabriela/Documentos/entrada.mia"
 
-	comandos.Ejecutar(Path)
-
+		comandos.Ejecutar(Path)*/
+	var bytes [14]byte
+	fmt.Println(unsafe.Sizeof(bytes))
 }

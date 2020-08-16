@@ -1,6 +1,7 @@
-package comandos
+package disco
 
 import (
+	"Archivos/PY1/estructuras"
 	"bytes"
 	"encoding/binary"
 	"fmt"
@@ -33,11 +34,11 @@ func CrearDisco(param Mkdisk) string {
 			return "Error: No se pudo crear el disco"
 		}
 		t := time.Now()
-		var disco MBR
+		var disco estructuras.MBR
 		disco.Size = param.Size
 		s := string(t.Format("Mon Jan _2 15:04:05 2006"))
 		for i := 0; i < len(s); i++ {
-			disco.Creacion[i] = rune(s[i])
+			disco.Creacion[i] = byte(s[i])
 		}
 		var cero int8 = 0
 		var binario bytes.Buffer

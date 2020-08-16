@@ -22,7 +22,7 @@ func Ejecutar(cadena string) {
 func leerComando(raiz analizador.Nodo) {
 	switch strings.ToUpper(raiz.Dato) {
 	case "MKDISK":
-		mkdisk := Mkdisk{-1, "", "", "m"}
+		mkdisk := disco.Mkdisk{-1, "", "", "m"}
 		for i := 0; i < len(raiz.Hijos); i++ {
 			validarMKDISK(raiz.Hijos[i], &mkdisk)
 		}
