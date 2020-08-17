@@ -69,6 +69,7 @@ func leerComando(raiz analizador.Nodo) {
 					if VerificarSize(fdisk.Size, raiz.Linea) {
 						if len(fdisk.Unit) > 0 {
 							fdisk.Size = DarSize(fdisk.Size, fdisk.Unit)
+							//verificar tipo
 							//---------------------------------------------------------------------------------------metodo para crear particion
 						}
 					}
@@ -101,10 +102,7 @@ func leerComando(raiz analizador.Nodo) {
 	case "REP":
 	case "PAUSE":
 		fmt.Println("El programa esta en pausa, presione cualquier letra para continuar")
-		var tecla string
-		for len(tecla) == 0 {
-			fmt.Scan(&tecla)
-		}
+		fmt.Scan()
 	case "EXEC":
 		p := raiz.Hijos[0]
 		if strings.EqualFold(p.Dato, "path") {
@@ -135,7 +133,7 @@ func validarMKDISK(raiz analizador.Nodo, comando *Mkdisk) {
 	case "size":
 		comando.Size = analizador.ValidarSize(raiz.Hijos[0])
 	case "unit":
-		comando.Unit = analizador.ValidarUnidad(false, raiz.Hijos[0])
+		comando.Unit = strings.ToLower(analizador.ValidarUnidad(false, raiz.Hijos[0]))
 	}
 }
 
@@ -157,7 +155,7 @@ func validarFDISK(raiz analizador.Nodo, comando *disco.Fdisk) {
 		}
 	case "delete":
 		if strings.EqualFold(raiz.Hijos[0].Dato, "fast") || strings.EqualFold(raiz.Hijos[0].Dato, "full") {
-			comando.Delete = raiz.Hijos[0].Dato
+			comando.Delete = strings.ToLower(raiz.Hijos[0].Dato)
 		} else {
 			comando.Delete = "e"
 		}
@@ -166,12 +164,13 @@ func validarFDISK(raiz analizador.Nodo, comando *disco.Fdisk) {
 	case "type":
 		tipo := raiz.Hijos[0].Dato
 		if strings.EqualFold(tipo, "p") || strings.EqualFold(tipo, "e") || strings.EqualFold(tipo, "l") {
-			comando.Tipo = tipo
+			comando.Tipo = strings.ToLower(tipo)
 		} else {
-			comando.Tipo = "f"
+			comando.Tipo = ""
+			fmt.Println("Error: el parametro tipo solo acepta p, l o e")
 		}
 	case "fit":
-		comando.Fit = analizador.ValidarFit(raiz.Hijos[0])
+		comando.Fit = strings.ToLower(analizador.ValidarFit(raiz.Hijos[0]))
 	}
 }
 
