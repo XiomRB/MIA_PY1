@@ -6,13 +6,14 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 )
 
 //Mkdisk info del comando mkdisk
 type Mkdisk struct {
-	Size int
+	Size int64
 	Path string
 	Name string
 	Unit string
@@ -35,7 +36,8 @@ func CrearDisco(param Mkdisk) string {
 		}
 		t := time.Now()
 		var disco estructuras.MBR
-		disco.Size = param.Size
+		disco.Size = int64(param.Size)
+		disco.Indice = int64(rand.Intn(1000))
 		s := string(t.Format("Mon Jan _2 15:04:05 2006"))
 		for i := 0; i < len(s); i++ {
 			disco.Creacion[i] = byte(s[i])
@@ -48,9 +50,9 @@ func CrearDisco(param Mkdisk) string {
 		var binario2 bytes.Buffer
 		binary.Write(&binario2, binary.BigEndian, &cero)
 		EscribirBytes(file, binario2.Bytes())
-
-		var binario3 bytes.Buffer
-		binary.Write(&binario3, binary.BigEndian, &disco)
+		binario3 := new(bytes.Buffer)
+		binary.Write(binario3, binary.BigEndian, &disco)
+		file.Seek(0, 0)
 		EscribirBytes(file, binario3.Bytes())
 		file.Close()
 		return "Disco creado"
@@ -59,7 +61,7 @@ func CrearDisco(param Mkdisk) string {
 	return "Error: El disco ya existe"
 }
 
-func eliminarDisco(path string, l int) {
+func EliminarDisco(path string, l int) {
 	err := os.Remove(path)
 	if err != nil {
 		fmt.Println("Error: El disco no existe --Linea: ", l)

@@ -13,7 +13,7 @@ func ValidarPath(path string, l int) bool {
 	return true
 }
 
-func VerificarSize(size, l int) bool {
+func VerificarSize(size int64, l int) bool {
 	if size > 0 {
 		return true
 	} else if size == -1 {
@@ -31,11 +31,11 @@ func VerificarName(name string, l int) bool {
 	return false
 }
 
-func DarSize(s int, u string) int {
+func DarSize(s int64, u string) int64 {
 	if strings.EqualFold(u, "k") {
-		return s * 1024
+		return int64(s * 1024)
 	} else if strings.EqualFold(string(u), "m") {
-		return s * 1024 * 1024
+		return int64(s * 1024 * 1024)
 	}
-	return s
+	return int64(s)
 }

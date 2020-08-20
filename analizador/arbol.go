@@ -68,11 +68,11 @@ func nuevoPath(p Nodo) string {
 	return p.Dato
 }
 
-func ValidarSize(f Nodo) int {
+func ValidarSize(f Nodo) int64 {
 	s, err := strconv.Atoi(f.Dato)
 	if err == nil {
 		if s > 0 {
-			return s
+			return int64(s)
 		}
 		fmt.Println("Error: El parametro size debe ser mayor a 0  --- Linea: ", f.Linea, " Col: ", f.Columna)
 		return 0

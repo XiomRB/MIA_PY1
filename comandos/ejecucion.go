@@ -3,6 +3,7 @@ package comandos
 import (
 	"Archivos/PY1/analizador"
 	"Archivos/PY1/comandos/disco"
+	"Archivos/PY1/estructuras"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -26,12 +27,12 @@ func leerComando(raiz analizador.Nodo) {
 		for i := 0; i < len(raiz.Hijos); i++ {
 			validarMKDISK(raiz.Hijos[i], &mkdisk)
 		}
-		if ValidarPath(mkdisk.Path, raiz.Linea) {
-			if VerificarName(mkdisk.Name, raiz.Linea) {
-				if VerificarSize(mkdisk.Size, raiz.Linea) {
+		if estructuras.ValidarPath(mkdisk.Path, raiz.Linea) {
+			if estructuras.VerificarName(mkdisk.Name, raiz.Linea) {
+				if estructuras.VerificarSize(mkdisk.Size, raiz.Linea) {
 					if len(mkdisk.Unit) > 0 {
-						mkdisk.Size = DarSize(mkdisk.Size, mkdisk.Unit)
-						fmt.Println(CrearDisco(mkdisk))
+						mkdisk.Size = estructuras.DarSize(mkdisk.Size, mkdisk.Unit)
+						fmt.Println(disco.CrearDisco(mkdisk))
 					}
 				}
 			}
@@ -39,7 +40,7 @@ func leerComando(raiz analizador.Nodo) {
 	case "RMDISK":
 		n := raiz.Hijos[0]
 		if strings.EqualFold(n.Dato, "path") {
-			eliminarDisco(analizador.HomePath(n.Hijos[0]), raiz.Linea)
+			disco.EliminarDisco(analizador.HomePath(n.Hijos[0]), raiz.Linea)
 		} else {
 			fmt.Println("Error: El parametro path es obligatorio  --Linea: ", raiz.Linea)
 		}
@@ -48,28 +49,29 @@ func leerComando(raiz analizador.Nodo) {
 		for i := 0; i < len(raiz.Hijos); i++ {
 			validarFDISK(raiz.Hijos[i], &fdisk)
 		}
-		if ValidarPath(fdisk.Path, raiz.Linea) {
-			if VerificarName(fdisk.Name, raiz.Linea) {
+		if estructuras.ValidarPath(fdisk.Path, raiz.Linea) {
+			if estructuras.VerificarName(fdisk.Name, raiz.Linea) {
 				if fdisk.Add == 0 && len(fdisk.Delete) > 1 { //Parametro delete
 					if fdisk.Size == 0 {
-						if len(fdisk.Unit) > 0 {
-							fdisk.Add = DarSize(fdisk.Add, fdisk.Unit)
-							//---------------------------------------------------------------------------------------metodo que aniade
-						}
-					} else {
-						fmt.Println("Error: los parametros size y add no pueden ir juntos --Linea: ", raiz.Linea)
-					}
-				} else if (fdisk.Add != -1000000 && fdisk.Add != 0) && len(fdisk.Delete) == 0 { //parametro add
-					if fdisk.Size == 0 {
-						//--------------------------------------------------------------------------------------------metodo para eliminar
+						//---------------------------------------------------------------------------------------metodo que elimina
+
 					} else {
 						fmt.Println("Error: los parametros size y delete no pueden ir juntos --Linea: ", raiz.Linea)
 					}
+				} else if (fdisk.Add != -1000000 && fdisk.Add != 0) && len(fdisk.Delete) == 0 { //parametro add
+					if fdisk.Size == 0 {
+						fdisk.Add = estructuras.DarSize(fdisk.Add, fdisk.Unit)
+						//--------------------------------------------------------------------------------------------metodo para aniade
+					} else {
+						fmt.Println("Error: los parametros size y add no pueden ir juntos --Linea: ", raiz.Linea)
+					}
 				} else if fdisk.Add == 0 && len(fdisk.Delete) == 0 {
-					if VerificarSize(fdisk.Size, raiz.Linea) {
+					if estructuras.VerificarSize(fdisk.Size, raiz.Linea) {
 						if len(fdisk.Unit) > 0 {
-							fdisk.Size = DarSize(fdisk.Size, fdisk.Unit)
-							//verificar tipo
+							fdisk.Size = estructuras.DarSize(fdisk.Size, fdisk.Unit)
+							if len(fdisk.Tipo) > 0 {
+								disco.Administrar(fdisk)
+							}
 							//---------------------------------------------------------------------------------------metodo para crear particion
 						}
 					}
@@ -119,7 +121,7 @@ func leerComando(raiz analizador.Nodo) {
 	}
 }
 
-func validarMKDISK(raiz analizador.Nodo, comando *Mkdisk) {
+func validarMKDISK(raiz analizador.Nodo, comando *disco.Mkdisk) {
 	switch strings.ToLower(raiz.Dato) {
 	case "path":
 		comando.Path = analizador.HomePath(raiz.Hijos[0])
@@ -151,7 +153,7 @@ func validarFDISK(raiz analizador.Nodo, comando *disco.Fdisk) {
 			fmt.Println("Error: el parametro add solo recibe valores numericos --Linea: ", raiz.Linea)
 			comando.Add = -1000000
 		} else {
-			comando.Add = s
+			comando.Add = int64(s)
 		}
 	case "delete":
 		if strings.EqualFold(raiz.Hijos[0].Dato, "fast") || strings.EqualFold(raiz.Hijos[0].Dato, "full") {

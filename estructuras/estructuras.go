@@ -2,9 +2,9 @@ package estructuras
 
 //MBR para crear Disco
 type MBR struct {
-	Size        int
+	Size        int64
 	Creacion    [30]byte
-	Indice      int
+	Indice      int64
 	Particiones [4]Particion
 }
 
@@ -12,18 +12,19 @@ type MBR struct {
 type InfoPart struct {
 	Tipo   byte
 	Name   [16]byte
-	Inicio int
-	Size   int
+	Inicio int64
+	Size   int64
 	Ajuste byte
+	Estado bool
 }
 
 //EBR contiene info de las particiones logicas
 type EBR struct {
 	Status byte
 	Fit    byte
-	Start  int
-	Size   int
-	Next   int
+	Start  int64
+	Size   int64
+	Next   int64
 	Name   [16]byte
 }
 
@@ -32,7 +33,7 @@ type Particion struct {
 	Status byte
 	Tipo   byte
 	Fit    byte
-	Start  int
-	Size   int
+	Start  int64
+	Size   int64
 	Name   [16]byte
 }
