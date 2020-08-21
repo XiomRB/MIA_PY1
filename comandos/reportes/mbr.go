@@ -1,5 +1,5 @@
 package reportes
 
-fun CrearRepMBR(){
-	
+func CrearRepMBR() {
+
 }

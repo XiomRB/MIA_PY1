@@ -103,7 +103,7 @@ func Montar(comando Mount) {
 
 func Desmontar(u Unmount) {
 	for i := 0; i < len(u.Desmontadas); i++ {
-		letra := encontrarLetra(byte(u.Desmontadas[i][2]))
+		letra := EncontrarLetra(byte(u.Desmontadas[i][2]))
 		num := int(u.Desmontadas[i][3])
 		if len(DiscosMontados) > 0 {
 			if verifDiscoMontado(letra) {
@@ -158,16 +158,16 @@ func extraerPart(path string, name [16]byte, parts [4]estructuras.Particion) est
 			m.Ajuste = parts[i].Fit
 			return m
 		}
-		if parts[i].Tipo == getChar("e") {
+		if parts[i].Tipo == GetChar("e") {
 			ext = parts[i]
 		}
 	}
-	if ext.Tipo != getChar("e") {
+	if ext.Tipo != GetChar("e") {
 		return m
 	}
-	ebr := leerEBR(path, ext.Start)
+	ebr := LeerEBR(path, ext.Start)
 	for ebr.Next != -1 && ebr.Name != name {
-		ebr = leerEBR(path, ebr.Next)
+		ebr = LeerEBR(path, ebr.Next)
 	}
 	if ebr.Name == name {
 		m.Estado = true
@@ -230,115 +230,115 @@ func verifPartMontada(disco Montado, indice int) bool {
 func asignarLetra(i int) byte {
 	switch i {
 	case 0:
-		return getChar("a")
+		return GetChar("a")
 	case 1:
-		return getChar("b")
+		return GetChar("b")
 	case 2:
-		return getChar("c")
+		return GetChar("c")
 	case 3:
-		return getChar("d")
+		return GetChar("d")
 	case 4:
-		return getChar("e")
+		return GetChar("e")
 	case 5:
-		return getChar("f")
+		return GetChar("f")
 	case 6:
-		return getChar("g")
+		return GetChar("g")
 	case 7:
-		return getChar("h")
+		return GetChar("h")
 	case 8:
-		return getChar("i")
+		return GetChar("i")
 	case 9:
-		return getChar("j")
+		return GetChar("j")
 	case 10:
-		return getChar("k")
+		return GetChar("k")
 	case 11:
-		return getChar("l")
+		return GetChar("l")
 	case 12:
-		return getChar("m")
+		return GetChar("m")
 	case 13:
-		return getChar("n")
+		return GetChar("n")
 	case 14:
-		return getChar("o")
+		return GetChar("o")
 	case 15:
-		return getChar("p")
+		return GetChar("p")
 	case 16:
-		return getChar("q")
+		return GetChar("q")
 	case 17:
-		return getChar("r")
+		return GetChar("r")
 	case 18:
-		return getChar("d")
+		return GetChar("d")
 	case 19:
-		return getChar("t")
+		return GetChar("t")
 	case 20:
-		return getChar("u")
+		return GetChar("u")
 	case 21:
-		return getChar("v")
+		return GetChar("v")
 	case 22:
-		return getChar("w")
+		return GetChar("w")
 	case 23:
-		return getChar("x")
+		return GetChar("x")
 	case 24:
-		return getChar("y")
+		return GetChar("y")
 	case 25:
-		return getChar("z")
+		return GetChar("z")
 	default:
-		return getChar("0")
+		return GetChar("0")
 	}
 }
 
-func encontrarLetra(l byte) int {
+func EncontrarLetra(l byte) int {
 	switch l {
-	case getChar("a"):
+	case GetChar("a"):
 		return 0
-	case getChar("b"):
+	case GetChar("b"):
 		return 1
-	case getChar("c"):
+	case GetChar("c"):
 		return 2
-	case getChar("d"):
+	case GetChar("d"):
 		return 3
-	case getChar("e"):
+	case GetChar("e"):
 		return 4
-	case getChar("f"):
+	case GetChar("f"):
 		return 5
-	case getChar("g"):
+	case GetChar("g"):
 		return 6
-	case getChar("h"):
+	case GetChar("h"):
 		return 7
-	case getChar("i"):
+	case GetChar("i"):
 		return 8
-	case getChar("j"):
+	case GetChar("j"):
 		return 9
-	case getChar("k"):
+	case GetChar("k"):
 		return 10
-	case getChar("l"):
+	case GetChar("l"):
 		return 11
-	case getChar("m"):
+	case GetChar("m"):
 		return 12
-	case getChar("n"):
+	case GetChar("n"):
 		return 13
-	case getChar("o"):
+	case GetChar("o"):
 		return 14
-	case getChar("p"):
+	case GetChar("p"):
 		return 15
-	case getChar("q"):
+	case GetChar("q"):
 		return 16
-	case getChar("r"):
+	case GetChar("r"):
 		return 17
-	case getChar("s"):
+	case GetChar("s"):
 		return 18
-	case getChar("t"):
+	case GetChar("t"):
 		return 19
-	case getChar("u"):
+	case GetChar("u"):
 		return 20
-	case getChar("v"):
+	case GetChar("v"):
 		return 21
-	case getChar("w"):
+	case GetChar("w"):
 		return 22
-	case getChar("x"):
+	case GetChar("x"):
 		return 23
-	case getChar("y"):
+	case GetChar("y"):
 		return 24
-	case getChar("z"):
+	case GetChar("z"):
 		return 25
 	default:
 		return 100
