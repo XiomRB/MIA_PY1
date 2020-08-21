@@ -43,10 +43,10 @@ func Administrar(comando Fdisk) {
 			fmt.Scanln(&op)
 			if op == "1" {
 				borrada := borrarPart(comando, &mbr)
-				if borrada.Status != getChar("0") {
+				if borrada.Status != GetChar("0") {
 					var u Unmount
 					u.Desmontadas = append(u.Desmontadas, comando.Name)
-					if borrada.Tipo == getChar("p") || borrada.Tipo == getChar("e") {
+					if borrada.Tipo == GetChar("p") || borrada.Tipo == GetChar("e") {
 						Desmontar(u)
 						if strings.EqualFold(comando.Delete, "full") {
 							f, err := os.OpenFile(comando.Path, os.O_RDWR, 0755) //leer o escribir
@@ -61,7 +61,7 @@ func Administrar(comando Fdisk) {
 							f.Close()
 							fmt.Println("Particion borrada con exito")
 						}
-					} else if borrada.Tipo == getChar("l") {
+					} else if borrada.Tipo == GetChar("l") {
 						Desmontar(u)
 						fmt.Println("Particion borrada con exito")
 					}
@@ -84,9 +84,9 @@ func Administrar(comando Fdisk) {
 
 func crearParticion(comando Fdisk, mbr *estructuras.MBR) {
 	if int64(comando.Size) < (mbr.Size - int64(unsafe.Sizeof(*mbr))) {
-		full := comprobarParticionesLlenas(mbr)
+		full := ComprobarParticionesLlenas(mbr)
 		if !comprobarName(mbr, comando.Name) {
-			if comprobarParticionesVacias(mbr) {
+			if ComprobarParticionesVacias(mbr) {
 				if strings.EqualFold(comando.Tipo, "p") { //primaria
 					mbr.Particiones[0] = nuevaParticion(comando)
 				} else if strings.EqualFold(comando.Tipo, "e") { //extendida
@@ -100,7 +100,7 @@ func crearParticion(comando Fdisk, mbr *estructuras.MBR) {
 				}
 			} else if full { // 4 particiones llenas
 				if strings.EqualFold(comando.Tipo, "l") {
-					extendida := getExtendida(mbr)
+					extendida := GetExtendida(mbr)
 					if extendida.Size > 0 {
 						adminEBR(extendida, comando)
 					} else {
@@ -116,10 +116,10 @@ func crearParticion(comando Fdisk, mbr *estructuras.MBR) {
 				case "p":
 					fFPart(mbr, comando)
 				case "e":
-					extendida := getExtendida(mbr)
-					if extendida.Tipo != getChar("e") {
+					extendida := GetExtendida(mbr)
+					if extendida.Tipo != GetChar("e") {
 						fFPart(mbr, comando)
-						extendida = getExtendida(mbr)
+						extendida = GetExtendida(mbr)
 						ebr := nuevoEBR(comando)
 						ebr.Start = extendida.Start
 						escribirEBR(comando, &ebr)
@@ -128,8 +128,8 @@ func crearParticion(comando Fdisk, mbr *estructuras.MBR) {
 						return
 					}
 				case "l":
-					extendida := getExtendida(mbr)
-					if extendida.Tipo == getChar("e") {
+					extendida := GetExtendida(mbr)
+					if extendida.Tipo == GetChar("e") {
 						adminEBR(extendida, comando)
 					} else {
 						fmt.Println("Error: No puede crear una particion logica sin haber una extendida")
@@ -148,15 +148,13 @@ func crearParticion(comando Fdisk, mbr *estructuras.MBR) {
 
 func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 	var name [16]byte
-	for i := 0; i < 16; i++ {
-		name[i] = comando.Name[i]
-	}
+	copy(name[:], comando.Name)
 	if comando.Add > 0 { //sumar espacio a la particion
 		var part estructuras.Particion
 		var aux estructuras.Particion
 		i := 0
 		for i = 0; i < 4; i++ {
-			if mbr.Particiones[i].Tipo == getChar("e") {
+			if mbr.Particiones[i].Tipo == GetChar("e") {
 				aux = mbr.Particiones[i]
 			}
 			if name == mbr.Particiones[i].Name {
@@ -181,7 +179,7 @@ func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 				fmt.Println("Error: No hay suficiente espacio para agrandar la particion")
 			}
 		} else if i == 4 {
-			if aux.Tipo == getChar("e") { // verificar si hay extendida
+			if aux.Tipo == GetChar("e") { // verificar si hay extendida
 				var ebr estructuras.EBR
 				ebr = leerEBR(comando.Path, aux.Start)
 				for ebr.Next != -1 && ebr.Name != name {
@@ -225,11 +223,11 @@ func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 				}
 				return
 			}
-			if mbr.Particiones[i].Tipo == getChar("e") {
+			if mbr.Particiones[i].Tipo == GetChar("e") {
 				part = mbr.Particiones[i]
 			}
 		}
-		if part.Tipo == getChar("e") {
+		if part.Tipo == GetChar("e") {
 			var ebr estructuras.EBR
 			ebr = leerEBR(comando.Path, part.Start)
 			for ebr.Next != 1 && ebr.Name != name {
@@ -253,9 +251,7 @@ func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 
 func borrarPart(c Fdisk, mbr *estructuras.MBR) estructuras.Particion {
 	var name [16]byte
-	for i := 0; i < 16; i++ {
-		name[i] = c.Name[i]
-	}
+	copy(name[:], c.Name)
 	var part estructuras.Particion
 	var aux estructuras.Particion
 	for i := 0; i < 4; i++ {
@@ -263,9 +259,9 @@ func borrarPart(c Fdisk, mbr *estructuras.MBR) estructuras.Particion {
 			part = mbr.Particiones[i]
 			mbr.Particiones[i].Size = 0
 			mbr.Particiones[i].Start = mbr.Size
-			mbr.Particiones[i].Status = getChar("0")
+			mbr.Particiones[i].Status = GetChar("0")
 			mbr.Particiones = ordenarParticiones(mbr.Particiones, 4)
-			if part.Tipo == getChar("e") {
+			if part.Tipo == GetChar("e") {
 				var ebr estructuras.EBR
 				ebr = leerEBR(c.Path, part.Start)
 				ebr = nuevoEBR(c)
@@ -273,12 +269,12 @@ func borrarPart(c Fdisk, mbr *estructuras.MBR) estructuras.Particion {
 			}
 			return part
 		}
-		if mbr.Particiones[i].Tipo == getChar("e") {
+		if mbr.Particiones[i].Tipo == GetChar("e") {
 			aux = mbr.Particiones[i]
 		}
 	}
-	if aux.Tipo == getChar("e") {
-		aux.Tipo = getChar("l")
+	if aux.Tipo == GetChar("e") {
+		aux.Tipo = GetChar("l")
 		var ebr estructuras.EBR
 		var ebraux estructuras.EBR
 		ebr = leerEBR(c.Path, aux.Start)
@@ -287,7 +283,7 @@ func borrarPart(c Fdisk, mbr *estructuras.MBR) estructuras.Particion {
 			ebr.Size = 0
 			ebr.Status = 0
 			for i := 0; i < 16; i++ {
-				ebr.Name[i] = getChar("0")
+				ebr.Name[i] = GetChar("0")
 			}
 			escribirEBR(c, &ebr)
 			aux.Name = ebraux.Name
@@ -313,7 +309,7 @@ func borrarPart(c Fdisk, mbr *estructuras.MBR) estructuras.Particion {
 			aux.Name = ebr.Name
 			return aux
 		}
-		aux.Status = getChar("0")
+		aux.Status = GetChar("0")
 		return aux
 	}
 	return aux
@@ -357,9 +353,9 @@ func leerEBR(path string, seek int64) estructuras.EBR {
 
 func adminEBR(extendida estructuras.Particion, comando Fdisk) {
 	ebr := leerEBR(comando.Path, extendida.Start)
-	if ebr.Next == -1 && ebr.Status == getChar("0") {
-		ebr.Status = getChar("1")
-		ebr.Fit = getChar(comando.Fit)
+	if ebr.Next == -1 && ebr.Status == GetChar("0") {
+		ebr.Status = GetChar("1")
+		ebr.Fit = GetChar(comando.Fit)
 		ebr.Start = extendida.Start
 		ebr.Size = comando.Size
 		ebr.Next = -1
@@ -384,7 +380,7 @@ func fFPart(mbr *estructuras.MBR, c Fdisk) {
 	var disponible [4]int64
 	posicion := 0
 	part := nuevaParticion(c)
-	part.Status = getChar("0")
+	part.Status = GetChar("0")
 	tam := mbr.Particiones[0].Start - int64(unsafe.Sizeof(*mbr))
 	if tam > 0 {
 		posicion++
@@ -393,25 +389,25 @@ func fFPart(mbr *estructuras.MBR, c Fdisk) {
 	}
 	tam = 0
 	for i := 0; i < 3; i++ {
-		if mbr.Particiones[i+1].Status != getChar("1") || mbr.Particiones[i+1].Start == mbr.Size {
+		if mbr.Particiones[i+1].Status != GetChar("1") || mbr.Particiones[i+1].Start == mbr.Size {
 			ini[posicion] = mbr.Particiones[i].Start + mbr.Particiones[i].Size
 			disponible[posicion] = mbr.Size - ini[posicion]
 			posicion++
 			break
 		}
 		ini[posicion] = mbr.Particiones[i].Start + mbr.Particiones[i].Size
-		disponible[posicion] = mbr.Size - ini[posicion]
+		disponible[posicion] = mbr.Particiones[i+1].Start - ini[posicion]
 		posicion++
 	}
 	for i := 0; i < posicion; i++ {
 		if disponible[i] >= c.Size {
 			part.Start = ini[i]
-			part.Status = getChar("1")
+			part.Status = GetChar("1")
 			mbr.Particiones[posicion] = part
 			break
 		}
 	}
-	if part.Status != getChar("1") {
+	if part.Status != GetChar("1") {
 		fmt.Println("Error: No hay espacio suficiente para crear la particion")
 	} else {
 		mbr.Particiones = ordenarParticiones(mbr.Particiones, posicion)
@@ -422,8 +418,8 @@ func peorAjuste(ebr, ebraux estructuras.EBR, p, u *listaEBR, c Fdisk) {
 	if u.size >= c.Size {
 		if u.inicio == u.antes {
 			ebr = leerEBR(c.Path, u.inicio)
-			ebr.Status = getChar("1")
-			ebr.Fit = getChar(c.Fit)
+			ebr.Status = GetChar("1")
+			ebr.Fit = GetChar(c.Fit)
 			ebr.Start = u.inicio
 			ebr.Size = c.Size
 			for i := 0; i < 16; i++ {
@@ -433,8 +429,7 @@ func peorAjuste(ebr, ebraux estructuras.EBR, p, u *listaEBR, c Fdisk) {
 		} else {
 			ebr = leerEBR(c.Path, u.antes)
 			auxini := ebr.Next
-			ebraux.Status = getChar("1")
-			ebraux.Fit = getChar(c.Fit)
+			ebraux.Status = GetChar("1")
 			ebraux.Start = u.inicio
 			ebraux.Size = c.Size
 			ebraux.Next = auxini
@@ -457,8 +452,8 @@ func ajustar(ebr, ebraux estructuras.EBR, p, u *listaEBR, c Fdisk) {
 		if aux.size >= c.Size {
 			if aux.antes == aux.inicio {
 				ebr = leerEBR(c.Path, aux.inicio)
-				ebr.Status = getChar("1")
-				ebr.Fit = getChar(c.Fit)
+				ebr.Status = GetChar("1")
+				ebr.Fit = GetChar(c.Fit)
 				ebr.Start = aux.inicio
 				ebr.Size = c.Size
 				for i := 0; i < 16; i++ {
@@ -468,8 +463,8 @@ func ajustar(ebr, ebraux estructuras.EBR, p, u *listaEBR, c Fdisk) {
 			} else {
 				ebr = leerEBR(c.Path, aux.antes)
 				auxini := ebr.Next
-				ebraux.Status = getChar("1")
-				ebraux.Fit = getChar(c.Fit)
+				ebraux.Status = GetChar("1")
+				ebraux.Fit = GetChar(c.Fit)
 				ebraux.Start = aux.inicio
 				ebraux.Size = c.Size
 				ebraux.Next = auxini
@@ -492,7 +487,7 @@ func ordenarParticiones(parts [4]estructuras.Particion, pos int) [4]estructuras.
 	var aux estructuras.Particion
 	for i := 1; i < pos; i++ {
 		for j := 0; j < pos; j++ {
-			if parts[j].Start >= parts[j+1].Start {
+			if parts[j].Start > parts[j+1].Start {
 				aux = parts[j]
 				parts[j] = parts[j+1]
 				parts[j+1] = aux
@@ -508,7 +503,7 @@ func agregarEBR(exte estructuras.Particion, c Fdisk, ebr estructuras.EBR) {
 	var aux estructuras.EBR
 	var size int64
 	var pos int64
-	if ebr.Status == getChar("0") && ebr.Next != -1 {
+	if ebr.Status == GetChar("0") && ebr.Next != -1 {
 		aux = leerEBR(c.Path, ebr.Next)
 		size = aux.Start - ebr.Start
 		pos = ebr.Start
@@ -528,9 +523,9 @@ func agregarEBR(exte estructuras.Particion, c Fdisk, ebr estructuras.EBR) {
 		listarEBR(&primero, &ultimo, size, pos, ebr.Start)
 	}
 	switch exte.Fit {
-	case getChar("f"):
+	case GetChar("f"):
 		ajustar(ebr, aux, &primero, &ultimo, c)
-	case getChar("b"):
+	case GetChar("b"):
 		ordenarEBR(&primero, &ultimo)
 	default:
 		ordenarEBR(&primero, &ultimo)
@@ -598,28 +593,28 @@ func escribirEBR(comando Fdisk, ebr *estructuras.EBR) {
 	f.Close()
 }
 
-func getExtendida(mbr *estructuras.MBR) estructuras.Particion {
+func GetExtendida(mbr *estructuras.MBR) estructuras.Particion {
 	var part estructuras.Particion
 	for i := 0; i < 4; i++ {
-		if mbr.Particiones[i].Tipo == getChar("e") {
+		if mbr.Particiones[i].Tipo == GetChar("e") {
 			return mbr.Particiones[i]
 		}
 	}
 	return part
 }
 
-func comprobarParticionesVacias(mbr *estructuras.MBR) bool {
+func ComprobarParticionesVacias(mbr *estructuras.MBR) bool {
 	for i := 0; i < 4; i++ {
-		if mbr.Particiones[i].Status == getChar("1") {
+		if mbr.Particiones[i].Status == GetChar("1") {
 			return false
 		}
 	}
 	return true
 }
 
-func comprobarParticionesLlenas(mbr *estructuras.MBR) bool {
+func ComprobarParticionesLlenas(mbr *estructuras.MBR) bool {
 	for i := 0; i < 4; i++ {
-		if mbr.Particiones[i].Status != getChar("1") {
+		if mbr.Particiones[i].Status != GetChar("1") {
 			return false
 		}
 	}
@@ -629,13 +624,7 @@ func comprobarParticionesLlenas(mbr *estructuras.MBR) bool {
 func comprobarName(mbr *estructuras.MBR, name string) bool {
 	for i := 0; i < 4; i++ {
 		var n [16]byte
-		tot := len(name)
-		if tot > 16 {
-			tot = 16
-		}
-		for j := 0; j < tot; j++ {
-			n[j] = name[j]
-		}
+		copy(n[:], name)
 		if n == mbr.Particiones[i].Name {
 			return true
 		}
@@ -647,30 +636,24 @@ func nuevaParticion(c Fdisk) estructuras.Particion {
 	var mbr estructuras.MBR
 	var part estructuras.Particion
 	part.Size = c.Size
-	tot := 16
-	if len(c.Name) < 16 {
-		tot = len(c.Name)
-	}
-	for i := 0; i < tot; i++ {
-		part.Name[i] = c.Name[i]
-	}
-	part.Status = getChar("1")
-	part.Fit = getChar(c.Fit)
-	part.Tipo = getChar(c.Tipo)
+	copy(part.Name[:], c.Name)
+	part.Status = GetChar("1")
+	part.Fit = GetChar(c.Fit)
+	part.Tipo = GetChar(c.Tipo)
 	part.Start = int64(unsafe.Sizeof(mbr))
 	return part
 }
 
 func nuevoEBR(c Fdisk) estructuras.EBR {
 	var ebr estructuras.EBR
-	ebr.Fit = getChar("w")
+	ebr.Fit = GetChar("w")
 	ebr.Next = -1
 	ebr.Size = 0
-	ebr.Status = getChar("0")
+	ebr.Status = GetChar("0")
 	return ebr
 }
 
-func getChar(s string) byte {
+func GetChar(s string) byte {
 	return s[0]
 }
 
