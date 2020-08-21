@@ -27,6 +27,7 @@ type Mount struct {
 	Path string
 	Name string
 }
+
 type Unmount struct {
 	Desmontadas []string
 }
@@ -132,6 +133,10 @@ func Desmontar(u Unmount) {
 }
 
 func MostrarMontadas() {
+	if len(DiscosMontados) == 0 {
+		fmt.Println("Aun no existen particiones montadas")
+		return
+	}
 	for i := 0; i < len(DiscosMontados); i++ {
 		if verifDiscoMontado(i) {
 			disco := DiscosMontados[i]
@@ -141,7 +146,6 @@ func MostrarMontadas() {
 					fmt.Println("id -> vd", asignarLetra(i), j+1, "  path -> ", disco.Path, "  name -> ", name)
 				}
 			}
-
 		}
 	}
 }

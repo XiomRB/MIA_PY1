@@ -20,15 +20,6 @@ type Reporte struct {
 	Ruta string
 }
 
-func RepMBR(comando Reporte) {
-	file, err := os.Create("rep.dot")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-}
-
 func crearGraphExt(ext estructuras.Particion, path string, size int64) string {
 	p := `<td width = '` + strconv.Itoa(int(ext.Size*600/size))
 	p += `' border = '0'>
@@ -73,9 +64,9 @@ func graphPart(size int64, nombre string) string {
 	return p
 }
 
-func graphParticiones(comando Reporte) string {
+func graphParticiones(path string) string {
 	dot := ""
-	mbr := disco.LeerDisco(comando.Path)
+	mbr := disco.LeerDisco(path)
 	if mbr.Size > 0 {
 		if !disco.ComprobarParticionesVacias(&mbr) { //si hay particiones en el disco
 			i := 0
@@ -86,7 +77,7 @@ func graphParticiones(comando Reporte) string {
 			for i = 0; i < 3; i++ {
 				if mbr.Particiones[i+1].Status == disco.GetChar("1") {
 					if mbr.Particiones[i].Tipo == disco.GetChar("e") {
-						dot += crearGraphExt(mbr.Particiones[i], comando.Path, mbr.Size)
+						dot += crearGraphExt(mbr.Particiones[i], path, mbr.Size)
 					} else {
 						dot += graphPart(mbr.Particiones[i].Size*600/mbr.Size, string(mbr.Particiones[i].Name[:]))
 					}
@@ -112,11 +103,27 @@ func graphParticiones(comando Reporte) string {
 	return dot
 }
 
-func RepDisk(comando Reporte) {
-
+func RepDisk(comando Reporte) string {
+	letra := comando.Id[2]
+	indice := comando.Id[3]
+	dot := `digraph g{
+			tbl[
+				shape = plaintext
+				label = <
+				<table border='1' cellborder='0' color='blue' cellspacing='1'>
+        			<tr>`
+	if verificarPM(letra, indice) {
+		dot += graphParticiones(disco.DiscosMontados[disco.EncontrarLetra(letra)].Path)
+		dot += "</tr></table>>];}"
+		return dot
+	}
+	return "Error, la particion no esta montada"
 }
 
 func Reportar(comando Reporte, rep string) string {
+	if len(rep) == 35 {
+		return rep
+	}
 	file, err := os.Create("reporte.dot")
 	if err != nil {
 		return "Error: No se pudo crear el reporte"
@@ -133,8 +140,17 @@ func Reportar(comando Reporte, rep string) string {
 	return "Reporte creado"
 }
 
-func verificarPM() {
-
+func verificarPM(letra, indice byte) bool {
+	num := int(indice)
+	l := disco.EncontrarLetra(letra)
+	if len(disco.DiscosMontados) > l {
+		if disco.DiscosMontados[l].Estado {
+			if len(disco.DiscosMontados[l].Particiones) >= num {
+				return disco.DiscosMontados[l].Particiones[num-1].Estado
+			}
+		}
+	}
+	return false
 }
 
 func quitarEspacios(p string) string {

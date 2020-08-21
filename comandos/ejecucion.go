@@ -79,7 +79,25 @@ func leerComando(raiz analizador.Nodo) {
 			}
 		}
 	case "MOUNT":
+		mount := disco.Mount{}
+		if len(raiz.Hijos) == 0 {
+			disco.MostrarMontadas()
+		} else {
+			for i := 0; i < len(raiz.Hijos); i++ {
+				validarMount(raiz.Hijos[i], &mount)
+			}
+			if len(mount.Path) == 0 || len(mount.Name) == 0 {
+				fmt.Println("Error: Los parametros no corresponden al comando mount")
+			} else {
+				disco.Montar(mount)
+			}
+		}
 	case "UNMOUNT":
+		unmount := disco.Unmount{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarUnmount(raiz.Hijos[i], &unmount)
+		}
+		disco.Desmontar(unmount)
 	case "MKFS":
 	case "LOGIN":
 	case "LOGOUT":
@@ -173,6 +191,21 @@ func validarFDISK(raiz analizador.Nodo, comando *disco.Fdisk) {
 		}
 	case "fit":
 		comando.Fit = strings.ToLower(analizador.ValidarFit(raiz.Hijos[0]))
+	}
+}
+
+func validarMount(raiz analizador.Nodo, comando *disco.Mount) {
+	switch strings.ToLower(raiz.Dato) {
+	case "path":
+		comando.Path = analizador.HomePath(raiz.Hijos[0])
+	case "name":
+		comando.Name = raiz.Hijos[0].Dato
+	}
+}
+
+func validarUnmount(raiz analizador.Nodo, comando *disco.Unmount) {
+	if strings.EqualFold(raiz.Dato, "id") {
+		comando.Desmontadas = append(comando.Desmontadas, raiz.Hijos[0].Dato)
 	}
 }
 
