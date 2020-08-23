@@ -3,6 +3,7 @@ package comandos
 import (
 	"Archivos/PY1/analizador"
 	"Archivos/PY1/comandos/disco"
+	"Archivos/PY1/comandos/reportes"
 	"Archivos/PY1/estructuras"
 	"fmt"
 	"io/ioutil"
@@ -52,15 +53,16 @@ func leerComando(raiz analizador.Nodo) {
 		if estructuras.ValidarPath(fdisk.Path, raiz.Linea) {
 			if estructuras.VerificarName(fdisk.Name, raiz.Linea) {
 				if fdisk.Add == 0 && len(fdisk.Delete) > 1 { //Parametro delete
-					if fdisk.Size == 0 {
+					if fdisk.Size == -1 {
 						//---------------------------------------------------------------------------------------metodo que elimina
-
+						disco.Administrar(fdisk)
 					} else {
 						fmt.Println("Error: los parametros size y delete no pueden ir juntos --Linea: ", raiz.Linea)
 					}
 				} else if (fdisk.Add != -1000000 && fdisk.Add != 0) && len(fdisk.Delete) == 0 { //parametro add
-					if fdisk.Size == 0 {
+					if fdisk.Size == -1 {
 						fdisk.Add = estructuras.DarSize(fdisk.Add, fdisk.Unit)
+						disco.Administrar(fdisk)
 						//--------------------------------------------------------------------------------------------metodo para aniade
 					} else {
 						fmt.Println("Error: los parametros size y add no pueden ir juntos --Linea: ", raiz.Linea)
@@ -120,6 +122,7 @@ func leerComando(raiz analizador.Nodo) {
 	case "LOSS":
 	case "RECOVERY":
 	case "REP":
+
 	case "PAUSE":
 		fmt.Println("El programa esta en pausa, presione cualquier letra para continuar")
 		fmt.Scan()
@@ -216,4 +219,17 @@ func ejecutarArchivo(n string) string {
 		return ""
 	}
 	return string(data)
+}
+
+func validarRep(raiz analizador.Nodo, comando *reportes.Reporte) {
+	switch strings.ToLower(raiz.Dato) {
+	case "path":
+		comando.Path = analizador.HomePath(raiz.Hijos[0])
+	case "name":
+		comando.Name = raiz.Hijos[0].Dato
+	case "id":
+		comando.Id = raiz.Hijos[0].Dato
+	case "ruta":
+		comando.Ruta = analizador.HomePath(raiz.Hijos[0])
+	}
 }
