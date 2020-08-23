@@ -154,12 +154,12 @@ func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 	copy(name[:], comando.Name)
 	if comando.Add > 0 { //sumar espacio a la particion
 		var part estructuras.Particion
-		var aux estructuras.Particion
+		//var aux estructuras.Particion
 		i := 0
 		for i = 0; i < 4; i++ {
-			if mbr.Particiones[i].Tipo == GetChar("e") {
+			/*	if mbr.Particiones[i].Tipo == GetChar("e") {
 				aux = mbr.Particiones[i]
-			}
+			}*/
 			if name == mbr.Particiones[i].Name {
 				part = mbr.Particiones[i]
 				break
@@ -167,9 +167,10 @@ func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 		}
 		if i == 3 {
 			disponible := mbr.Size - (part.Start + part.Size)
-			if disponible >= comando.Add {
+			if disponible > comando.Add {
 				part.Size += comando.Add
 				mbr.Particiones[i] = part
+				fmt.Println("Espacio agregado con exito")
 			} else {
 				fmt.Println("Error: No hay suficiente espacio para agrandar la particion")
 			}
@@ -181,7 +182,7 @@ func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 			} else {
 				fmt.Println("Error: No hay suficiente espacio para agrandar la particion")
 			}
-		} else if i == 4 {
+		} /*else if i == 4 {
 			if aux.Tipo == GetChar("e") { // verificar si hay extendida
 				var ebr estructuras.EBR
 				ebr = LeerEBR(comando.Path, aux.Start)
@@ -212,25 +213,25 @@ func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 			} else {
 				fmt.Println("Error: No existe la particion")
 			}
-		}
+		}*/
 
 	} else { //quitarle espacio a la particion
-		var part estructuras.Particion
+		//var part estructuras.Particion
 		for i := 0; i < 4; i++ {
 			if name == mbr.Particiones[i].Name {
 				if (-1 * comando.Add) < mbr.Particiones[i].Size {
 					mbr.Particiones[i].Size += comando.Add
-
+					fmt.Println("Espacio reducido con exito")
 				} else {
 					fmt.Println("Error: El espacio a eliminar es mayor al que ocupa la particion")
 				}
 				return
 			}
-			if mbr.Particiones[i].Tipo == GetChar("e") {
+			/*if mbr.Particiones[i].Tipo == GetChar("e") {
 				part = mbr.Particiones[i]
-			}
+			}*/
 		}
-		if part.Tipo == GetChar("e") {
+		/*if part.Tipo == GetChar("e") {
 			var ebr estructuras.EBR
 			ebr = LeerEBR(comando.Path, part.Start)
 			for ebr.Next != 1 && ebr.Name != name {
@@ -248,7 +249,7 @@ func modificarSize(comando Fdisk, mbr *estructuras.MBR) {
 			}
 		} else {
 			fmt.Println("Error: La particion no existe")
-		}
+		}*/
 	}
 }
 

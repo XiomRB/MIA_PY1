@@ -3,6 +3,8 @@ package disco
 import (
 	"Archivos/PY1/estructuras"
 	"fmt"
+	"log"
+	"strconv"
 )
 
 type Montada struct { //particion
@@ -34,9 +36,7 @@ type Unmount struct {
 
 func Montar(comando Mount) {
 	var name [16]byte
-	for i := 0; i < 16; i++ {
-		name[i] = comando.Name[i]
-	}
+	copy(name[:], comando.Name)
 	mbr := LeerDisco(comando.Path)
 	if mbr.Size > 0 {
 		part := extraerPart(comando.Path, name, mbr.Particiones) //obtine la info de la particion que se va a montar
@@ -44,7 +44,7 @@ func Montar(comando Mount) {
 			indice := -1
 			for i := 0; i < len(DiscosMontados); i++ { //busca el disco montado
 				indice = i
-				if DiscosMontados[i].Path == comando.Path {
+				if DiscosMontados[i].Path == comando.Path && DiscosMontados[i].Estado { //si es igual la particion esta montada
 					break
 				}
 			}
@@ -64,6 +64,8 @@ func Montar(comando Mount) {
 				if len(disco.Particiones) == 0 {
 					mont = crearMontada(part, 1)
 					disco.Particiones = append(disco.Particiones, mont)
+					DiscosMontados[indice] = disco
+					fmt.Println("Particion montada exitosamente")
 				} else {
 					for i := 0; i < len(disco.Particiones); i++ {
 						mont = disco.Particiones[i]
@@ -82,9 +84,12 @@ func Montar(comando Mount) {
 					mont = crearMontada(part, i+1)
 					if i == len(disco.Particiones) {
 						disco.Particiones = append(disco.Particiones, mont)
+						DiscosMontados[indice] = disco
 					} else {
 						disco.Particiones[i] = mont
+						DiscosMontados[indice] = disco
 					}
+					fmt.Println("Particion montada exitosamente")
 				}
 			} else { //sino montar disco y montar particion
 				mont := crearMontada(part, 1)
@@ -97,6 +102,7 @@ func Montar(comando Mount) {
 				disco.Letra = asignarLetra(indice)
 				disco.Particiones = append(disco.Particiones, mont)
 				DiscosMontados = append(DiscosMontados, disco)
+				fmt.Println("Particion montada exitosamente")
 			}
 		}
 	}
@@ -105,7 +111,10 @@ func Montar(comando Mount) {
 func Desmontar(u Unmount) {
 	for i := 0; i < len(u.Desmontadas); i++ {
 		letra := EncontrarLetra(byte(u.Desmontadas[i][2]))
-		num := int(u.Desmontadas[i][3])
+		num, err := strconv.Atoi(string(u.Desmontadas[i][3]))
+		if err != nil {
+			log.Fatal(err)
+		}
 		if len(DiscosMontados) > 0 {
 			if verifDiscoMontado(letra) {
 				disco := DiscosMontados[letra]
@@ -143,7 +152,7 @@ func MostrarMontadas() {
 			for j := 0; j < len(disco.Particiones); j++ {
 				name := MostrarInfoMontada(disco, j)
 				if len(name) > 0 {
-					fmt.Println("id -> vd", asignarLetra(i), j+1, "  path -> ", disco.Path, "  name -> ", name)
+					fmt.Println("id -> vd"+string(asignarLetra(i))+strconv.Itoa(j+1), "  path -> ", disco.Path, "  name -> ", name)
 				}
 			}
 		}
@@ -160,6 +169,7 @@ func extraerPart(path string, name [16]byte, parts [4]estructuras.Particion) est
 			m.Inicio = parts[i].Start
 			m.Estado = true
 			m.Ajuste = parts[i].Fit
+			m.Name = name
 			return m
 		}
 		if parts[i].Tipo == GetChar("e") {
@@ -184,11 +194,7 @@ func extraerPart(path string, name [16]byte, parts [4]estructuras.Particion) est
 
 func MostrarInfoMontada(disco Montado, indice int) string {
 	if verifPartMontada(disco, indice+1) {
-		name := ""
-		for i := 0; i < 16; i++ {
-			name += string(disco.Particiones[indice].Nombre[i])
-		}
-		return name
+		return string(disco.Particiones[indice].Nombre[:])
 	}
 	return ""
 }

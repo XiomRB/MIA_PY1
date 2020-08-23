@@ -1,0 +1,54 @@
+digraph g{
+			tbl[
+				shape = plaintext
+				label = <
+				<table border='1' cellborder='0' color='blue' cellspacing='1'>
+        			<tr><td width = '42' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Particion1</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '84' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Libre</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '11' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Particion6</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '23' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Libre</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '19' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Particion7</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '183' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Libre</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '49' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Particion5</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '210' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Libre</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td></tr></table>>];}

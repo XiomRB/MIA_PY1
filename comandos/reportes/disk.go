@@ -3,10 +3,10 @@ package reportes
 import (
 	"Archivos/PY1/comandos/disco"
 	"Archivos/PY1/estructuras"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"os/user"
 	"strconv"
 	"strings"
@@ -124,24 +124,23 @@ func Reportar(comando Reporte, rep string) string {
 	if len(rep) == 35 {
 		return rep
 	}
-	file, err := os.Create("reporte.dot")
+	err := ioutil.WriteFile("reporte.dot", []byte(rep), 0755)
 	if err != nil {
 		return "Error: No se pudo crear el reporte"
 	}
-	var dot []byte
-	copy(dot[:], rep)
-	file.Write(dot)
-	file.Close()
-	p := obtenerCarpeta(comando.Path)
+	/*p := obtenerCarpeta(comando.Path)
 	path, _ := exec.LookPath("dot")
 	cmd, _ := exec.Command(path, "-Tpng", "reporte.dot").Output()
 	mode := int(0777)
-	ioutil.WriteFile(p, cmd, os.FileMode(mode))
+	ioutil.WriteFile(p, cmd, os.FileMode(mode))*/
 	return "Reporte creado"
 }
 
 func verificarPM(letra, indice byte) bool {
-	num := int(indice)
+	num, err := strconv.Atoi(string(indice))
+	if err != nil {
+		log.Fatal(err)
+	}
 	l := disco.EncontrarLetra(letra)
 	if len(disco.DiscosMontados) > l {
 		if disco.DiscosMontados[l].Estado {
@@ -182,8 +181,19 @@ func obtenerCarpeta(p string) string {
 			for i := 2; i < len(lista)-1; i++ {
 				path += lista[i] + "/"
 			}
+		} else {
+			path = u.HomeDir + "/"
+			for i := 3; i < len(lista)-1; i++ {
+				path += lista[i] + "/"
+			}
+		}
+	} else {
+		path = "/"
+		for i := 0; i < len(lista)-1; i++ {
+			path += lista[i] + "/"
 		}
 	}
+	fmt.Println(path)
 	os.MkdirAll(path, 0755)
 	return ruta
 }

@@ -122,7 +122,11 @@ func leerComando(raiz analizador.Nodo) {
 	case "LOSS":
 	case "RECOVERY":
 	case "REP":
-
+		reporte := reportes.Reporte{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarRep(raiz.Hijos[i], &reporte)
+		}
+		reportes.AdministrarReportes(reporte)
 	case "PAUSE":
 		fmt.Println("El programa esta en pausa, presione cualquier letra para continuar")
 		fmt.Scan()
@@ -224,7 +228,7 @@ func ejecutarArchivo(n string) string {
 func validarRep(raiz analizador.Nodo, comando *reportes.Reporte) {
 	switch strings.ToLower(raiz.Dato) {
 	case "path":
-		comando.Path = analizador.HomePath(raiz.Hijos[0])
+		comando.Path = analizador.HomePath(raiz.Hijos[0]) + ".png"
 	case "name":
 		comando.Name = raiz.Hijos[0].Dato
 	case "id":
