@@ -16,7 +16,9 @@ func Ejecutar(cadena string) {
 	if len(cadena) > 0 {
 		raiz := analizador.Parser(cadena)
 		for i := 0; i < len(raiz.Hijos); i++ {
+			analizador.Imprimir(raiz.Hijos[i])
 			leerComando(raiz.Hijos[i])
+			fmt.Println("")
 		}
 	}
 }
@@ -228,7 +230,7 @@ func ejecutarArchivo(n string) string {
 func validarRep(raiz analizador.Nodo, comando *reportes.Reporte) {
 	switch strings.ToLower(raiz.Dato) {
 	case "path":
-		comando.Path = analizador.HomePath(raiz.Hijos[0]) + ".png"
+		comando.Path = analizador.HomePath(raiz.Hijos[0])
 	case "name":
 		comando.Name = raiz.Hijos[0].Dato
 	case "id":

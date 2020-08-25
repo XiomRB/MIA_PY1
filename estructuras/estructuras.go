@@ -3,7 +3,7 @@ package estructuras
 //MBR para crear Disco
 type MBR struct {
 	Size        int64
-	Creacion    [30]byte
+	Creacion    [25]byte
 	Indice      int64
 	Particiones [4]Particion
 }

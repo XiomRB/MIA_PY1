@@ -3,8 +3,6 @@ package reportes
 import (
 	"Archivos/PY1/comandos/disco"
 	"Archivos/PY1/estructuras"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
@@ -21,10 +19,14 @@ type Reporte struct {
 }
 
 func crearGraphExt(ext estructuras.Particion, path string, size int64) string {
+	n := ""
+	for j := 0; ext.Name[j] != 0; j++ {
+		n += string(ext.Name[j])
+	}
 	p := `<td width = '` + strconv.Itoa(int(ext.Size*600/size))
 	p += `' border = '0'>
 			<table border='1' cellborder='0' color='blue' cellspacing='1'>
-		 		<tr><td>` + string(ext.Name[:]) + `</td></tr>
+		 		<tr><td>` + n + `</td></tr>
 				 <tr>`
 
 	ebr := disco.LeerEBR(path, ext.Start)
@@ -40,7 +42,11 @@ func crearGraphExt(ext estructuras.Particion, path string, size int64) string {
 		if libre > 0 {
 			p += graphPart(libre*600/size, "Libre")
 		}
-		graphPart(ebr.Size*600/size, string(ebr.Name[:]))
+		n = ""
+		for j := 0; ebr.Name[j] != 0; j++ {
+			n += string(ebr.Name[j])
+		}
+		graphPart(ebr.Size*600/size, n)
 	}
 	libre = ext.Size - ebr.Size - ebr.Start
 	if libre > 0 {
@@ -68,6 +74,7 @@ func graphParticiones(path string) string {
 	dot := ""
 	mbr := disco.LeerDisco(path)
 	if mbr.Size > 0 {
+		dot += graphPart(int64(unsafe.Sizeof(mbr))*600/mbr.Size, "MBR")
 		if !disco.ComprobarParticionesVacias(&mbr) { //si hay particiones en el disco
 			i := 0
 			size := mbr.Particiones[0].Start - int64(unsafe.Sizeof(mbr))
@@ -79,20 +86,32 @@ func graphParticiones(path string) string {
 					if mbr.Particiones[i].Tipo == disco.GetChar("e") {
 						dot += crearGraphExt(mbr.Particiones[i], path, mbr.Size)
 					} else {
-						dot += graphPart(mbr.Particiones[i].Size*600/mbr.Size, string(mbr.Particiones[i].Name[:]))
+						n := ""
+						for j := 0; mbr.Particiones[i].Name[j] != 0; j++ {
+							n += string(mbr.Particiones[i].Name[j])
+						}
+						dot += graphPart(mbr.Particiones[i].Size*600/mbr.Size, n)
 					}
-					size = mbr.Particiones[i+1].Start - (mbr.Particiones[i].Start - mbr.Particiones[i].Size)
+					size = mbr.Particiones[i+1].Start - (mbr.Particiones[i].Start + mbr.Particiones[i].Size)
 					if size > 0 {
 						dot += graphPart(size*600/mbr.Size, "Libre")
 					}
 				} else {
-					dot += graphPart(mbr.Particiones[i].Size*600/mbr.Size, string(mbr.Particiones[i].Name[:]))
+					n := ""
+					for j := 0; mbr.Particiones[i].Name[j] != 0; j++ {
+						n += string(mbr.Particiones[i].Name[j])
+					}
+					dot += graphPart(mbr.Particiones[i].Size*600/mbr.Size, n)
 					dot += graphPart((mbr.Size-mbr.Particiones[i].Start-mbr.Particiones[i].Size)*600/mbr.Size, "Libre")
 					break
 				}
 			}
 			if i == 3 {
-				dot += graphPart(mbr.Particiones[i].Size*600/mbr.Size, string(mbr.Particiones[i].Name[:]))
+				n := ""
+				for j := 0; mbr.Particiones[i].Name[j] != 0; j++ {
+					n += string(mbr.Particiones[i].Name[j])
+				}
+				dot += graphPart(mbr.Particiones[i].Size*600/mbr.Size, n)
 				size = mbr.Size - mbr.Particiones[3].Size - mbr.Particiones[3].Start
 				if size > 0 {
 					dot += graphPart(size*600/mbr.Size, "Libre")
@@ -118,22 +137,6 @@ func RepDisk(comando Reporte) string {
 		return dot
 	}
 	return "Error, la particion no esta montada"
-}
-
-func Reportar(comando Reporte, rep string) string {
-	if len(rep) == 35 {
-		return rep
-	}
-	err := ioutil.WriteFile("reporte.dot", []byte(rep), 0755)
-	if err != nil {
-		return "Error: No se pudo crear el reporte"
-	}
-	/*p := obtenerCarpeta(comando.Path)
-	path, _ := exec.LookPath("dot")
-	cmd, _ := exec.Command(path, "-Tpng", "reporte.dot").Output()
-	mode := int(0777)
-	ioutil.WriteFile(p, cmd, os.FileMode(mode))*/
-	return "Reporte creado"
 }
 
 func verificarPM(letra, indice byte) bool {
@@ -193,7 +196,6 @@ func obtenerCarpeta(p string) string {
 			path += lista[i] + "/"
 		}
 	}
-	fmt.Println(path)
 	os.MkdirAll(path, 0755)
 	return ruta
 }

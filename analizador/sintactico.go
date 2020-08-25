@@ -26,7 +26,6 @@ func com() Nodo {
 	if preanalisis.tipo == 3 {
 		nuevo = match(3, 0) //COMANDO
 		nuevo.Hijos = lp()
-		fmt.Println("")
 	} else {
 		imprimirErrorSint(3)
 	}
@@ -112,7 +111,6 @@ func match(tipo, t int8) Nodo {
 	if tipo != preanalisis.tipo {
 		imprimirErrorSint(tipo)
 	} else {
-		fmt.Print(preanalisis.lexema, " ")
 		if preanalisis.tipo != 6 {
 			numpreanalisis++
 			preanalisis = tokens[numpreanalisis]
