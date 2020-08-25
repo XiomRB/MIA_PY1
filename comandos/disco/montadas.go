@@ -41,10 +41,9 @@ func Montar(comando Mount) {
 	if mbr.Size > 0 {
 		part := extraerPart(comando.Path, name, mbr.Particiones) //obtine la info de la particion que se va a montar
 		if part.Estado {                                         //si encontro la particion
-			indice := -1
-			for i := 0; i < len(DiscosMontados); i++ { //busca el disco montado
-				indice = i
-				if DiscosMontados[i].Path == comando.Path && DiscosMontados[i].Estado { //si es igual la particion esta montada
+			indice := 0
+			for indice = 0; indice < len(DiscosMontados); indice++ { //busca el disco montado
+				if DiscosMontados[indice].Path == comando.Path && DiscosMontados[indice].Estado { //si es igual la particion esta montada
 					break
 				}
 			}
