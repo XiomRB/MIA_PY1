@@ -14,6 +14,7 @@ type Montada struct { //particion
 	Size   int64
 	Start  int64
 	Ajuste byte
+	User   estructuras.Usuario
 }
 
 type Montado struct { // disco
@@ -115,9 +116,9 @@ func Desmontar(u Unmount) {
 			log.Fatal(err)
 		}
 		if len(DiscosMontados) > 0 {
-			if verifDiscoMontado(letra) {
+			if VerifDiscoMontado(letra) {
 				disco := DiscosMontados[letra]
-				if verifPartMontada(disco, num) {
+				if VerifPartMontada(disco, num) {
 					desm := Montada{}
 					DiscosMontados[letra].Particiones[num-1] = desm
 					if verificarMontadas(disco) {
@@ -146,7 +147,7 @@ func MostrarMontadas() {
 		return
 	}
 	for i := 0; i < len(DiscosMontados); i++ {
-		if verifDiscoMontado(i) {
+		if VerifDiscoMontado(i) {
 			disco := DiscosMontados[i]
 			for j := 0; j < len(disco.Particiones); j++ {
 				name := MostrarInfoMontada(disco, j)
@@ -192,13 +193,13 @@ func extraerPart(path string, name [16]byte, parts [4]estructuras.Particion) est
 }
 
 func MostrarInfoMontada(disco Montado, indice int) string {
-	if verifPartMontada(disco, indice+1) {
+	if VerifPartMontada(disco, indice+1) {
 		return string(disco.Particiones[indice].Nombre[:])
 	}
 	return ""
 }
 
-func verificarMontadas(disco Montado) bool {
+func verificarMontadas(disco Montado) bool { //verifica si ya no existen particiones montadas del disco para desmontarlo
 	for i := 0; i < len(disco.Particiones); i++ {
 		if disco.Particiones[i].Estado {
 			return false
@@ -218,7 +219,7 @@ func crearMontada(info estructuras.InfoPart, indice int) Montada {
 	return particion
 }
 
-func verifDiscoMontado(letra int) bool {
+func VerifDiscoMontado(letra int) bool { //verifica qeu el disco este montado
 	if len(DiscosMontados) > letra {
 		if DiscosMontados[letra].Estado {
 			return true
@@ -227,7 +228,7 @@ func verifDiscoMontado(letra int) bool {
 	return false
 }
 
-func verifPartMontada(disco Montado, indice int) bool {
+func VerifPartMontada(disco Montado, indice int) bool { ///verifica que la particion este montada
 	if len(disco.Particiones) >= indice {
 		if disco.Particiones[indice-1].Estado {
 			return true
