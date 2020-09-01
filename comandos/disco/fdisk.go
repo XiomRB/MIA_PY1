@@ -92,6 +92,8 @@ func crearParticion(comando Fdisk, mbr *estructuras.MBR) {
 			if ComprobarParticionesVacias(mbr) {
 				if strings.EqualFold(comando.Tipo, "p") { //primaria
 					mbr.Particiones[0] = nuevaParticion(comando)
+					sb := estructuras.SBoot{}
+					EscribirSB(comando.Path, mbr.Particiones[0].Start, sb)
 				} else if strings.EqualFold(comando.Tipo, "e") { //extendida
 					mbr.Particiones[0] = nuevaParticion(comando)
 					ebr := nuevoEBR(comando)
@@ -402,6 +404,8 @@ func fFPart(mbr *estructuras.MBR, c Fdisk) {
 			part.Start = ini[i]
 			part.Status = GetChar("1")
 			mbr.Particiones[posicion] = part
+			sb := estructuras.SBoot{}
+			EscribirSB(c.Path, part.Start, sb)
 			break
 		}
 	}

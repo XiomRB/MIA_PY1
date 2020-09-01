@@ -4,9 +4,11 @@ import (
 	"Archivos/PY1/analizador"
 	"Archivos/PY1/comandos/disco"
 	"Archivos/PY1/comandos/reportes"
+	"Archivos/PY1/comandos/sistema"
 	"Archivos/PY1/estructuras"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -103,6 +105,11 @@ func leerComando(raiz analizador.Nodo) {
 		}
 		disco.Desmontar(unmount)
 	case "MKFS":
+		mkfs := sistema.Mkfs{"", "", 0, "k"}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarMKFS(raiz.Hijos[i], &mkfs)
+		}
+		sistema.AdminComando(mkfs)
 	case "LOGIN":
 	case "LOGOUT":
 	case "MKGRP":
@@ -177,8 +184,7 @@ func validarFDISK(raiz analizador.Nodo, comando *disco.Fdisk) {
 	case "add":
 		s, err := strconv.Atoi(raiz.Hijos[0].Dato)
 		if err != nil {
-			fmt.Println("Error: el parametro add solo recibe valores numericos --Linea: ", raiz.Linea)
-			comando.Add = -1000000
+			log.Fatal(err)
 		} else {
 			comando.Add = int64(s)
 		}
@@ -237,5 +243,23 @@ func validarRep(raiz analizador.Nodo, comando *reportes.Reporte) {
 		comando.Id = raiz.Hijos[0].Dato
 	case "ruta":
 		comando.Ruta = analizador.HomePath(raiz.Hijos[0])
+	}
+}
+
+func validarMKFS(raiz analizador.Nodo, comando *sistema.Mkfs) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		comando.Id = raiz.Hijos[0].Dato
+	case "add":
+		s, err := strconv.Atoi(raiz.Hijos[0].Dato)
+		if err != nil {
+			log.Fatal(err)
+		}
+		comando.Add = int64(s)
+	case "type":
+		comando.Tipo = raiz.Hijos[0].Dato
+	case "unit":
+		comando.Unit = analizador.ValidarUnidad(true, raiz.Hijos[0])
+
 	}
 }

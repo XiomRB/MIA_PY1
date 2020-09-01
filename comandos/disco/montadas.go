@@ -2,19 +2,33 @@ package disco
 
 import (
 	"Archivos/PY1/estructuras"
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
+	"unsafe"
 )
 
 type Montada struct { //particion
-	Indice int
-	Estado bool
-	Nombre [16]byte
-	Size   int64
-	Start  int64
-	Ajuste byte
-	User   estructuras.Usuario
+	Indice        int
+	Estado        bool
+	Nombre        [16]byte
+	Size          int64
+	Start         int64
+	Ajuste        byte
+	User          estructuras.Logueado
+	Grupos        []estructuras.Grupo
+	Superboot     estructuras.SBoot
+	BitmapAVD     []byte
+	BitmapBloques []byte
+	BitmapDetalle []byte
+	BitmapInodo   []byte
+	AVD           []estructuras.AVD
+	DD            []estructuras.DetalleDir
+	Inodos        []estructuras.Inodo
+	BB            []estructuras.Bloque
 }
 
 type Montado struct { // disco
@@ -63,6 +77,7 @@ func Montar(comando Mount) {
 				var mont Montada
 				if len(disco.Particiones) == 0 {
 					mont = crearMontada(part, 1)
+					mont.Superboot = LeerSuperB(disco.Path, mont.Start)
 					disco.Particiones = append(disco.Particiones, mont)
 					DiscosMontados[indice] = disco
 					fmt.Println("Particion montada exitosamente")
@@ -82,6 +97,7 @@ func Montar(comando Mount) {
 						}
 					}
 					mont = crearMontada(part, i+1)
+					mont.Superboot = LeerSuperB(disco.Path, mont.Start)
 					if i == len(disco.Particiones) {
 						disco.Particiones = append(disco.Particiones, mont)
 						DiscosMontados[indice] = disco
@@ -96,6 +112,7 @@ func Montar(comando Mount) {
 				disco := Montado{}
 				disco.Path = comando.Path
 				disco.Estado = true
+				mont.Superboot = LeerSuperB(disco.Path, mont.Start)
 				if indice == -1 {
 					indice = 0
 				}
@@ -119,6 +136,7 @@ func Desmontar(u Unmount) {
 			if VerifDiscoMontado(letra) {
 				disco := DiscosMontados[letra]
 				if VerifPartMontada(disco, num) {
+					//------------------------------------------------------escribir lo hecho en el disco
 					desm := Montada{}
 					DiscosMontados[letra].Particiones[num-1] = desm
 					if verificarMontadas(disco) {
@@ -353,4 +371,33 @@ func EncontrarLetra(l byte) int {
 	default:
 		return 100
 	}
+}
+
+func LeerSuperB(path string, empieza int64) estructuras.SBoot {
+	f, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	sb := estructuras.SBoot{}
+	f.Seek(empieza, 0)
+	m := LeerBytes(f, int(unsafe.Sizeof(sb)))
+	buffer := bytes.NewBuffer(m)
+	err = binary.Read(buffer, binary.BigEndian, &sb)
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Close()
+	return sb
+}
+
+func EscribirSB(path string, parte int64, superboot estructuras.SBoot) {
+	f, err := os.OpenFile(path, os.O_RDWR, 777)
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Seek(parte, 0)
+	var binario bytes.Buffer
+	binary.Write(&binario, binary.BigEndian, superboot)
+	EscribirBytes(f, binario.Bytes())
+	f.Close()
 }

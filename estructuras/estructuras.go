@@ -39,45 +39,46 @@ type Particion struct {
 }
 
 type SBoot struct {
-	NameDisc           [16]byte
-	ArbolVirtual       int64
-	DetalleDirectorio  int64
-	Inodos             int64
-	Bloques            int64
-	LibreArbolVirtual  int64
-	LibreDetalleDirec  int64
-	LibreInodos        int64
-	LibreBloques       int64
-	Creacion           [25]byte
-	LastMontaje        [25]byte
-	Montajes           int64
-	BitmapArbol        int64
-	InicioArbol        int64
-	BitmapDetalleDirec int64
-	InicioDetalleDirec int64
-	BitmapTablaInodo   int64
-	InicioInodo        int64
-	BitmapBloques      int64
-	InicioBloque       int64
-	Bitacora           int64
-	SizeArbol          int64
-	SizeDetalleDirec   int64
-	SizeInodo          int64
-	SizeBloque         int64
-	LibreBitArbol      int64
-	LibreBitDetalle    int64
-	LibreBitInodo      int64
-	LibreBitBloque     int64
-	MagicNum           int64
+	NameDisc            [16]byte
+	NoArbolVirtual      int64
+	NoDetalleDirectorio int64
+	NoInodos            int64
+	NoBloques           int64
+	NoLibreArbolVirtual int64
+	NoLibreDetalleDirec int64
+	NoLibreInodos       int64
+	NoLibreBloques      int64
+	Creacion            [25]byte
+	LastMontaje         [25]byte
+	Montajes            int64
+	BitmapArbol         int64
+	InicioArbol         int64
+	BitmapDetalleDirec  int64
+	InicioDetalleDirec  int64
+	BitmapTablaInodo    int64
+	InicioInodo         int64
+	BitmapBloques       int64
+	InicioBloque        int64
+	InicioBitacora      int64
+	SizeArbol           int64
+	SizeDetalleDirec    int64
+	SizeInodo           int64
+	SizeBloque          int64
+	LibreBitArbol       int64
+	LibreBitDetalle     int64
+	LibreBitInodo       int64
+	LibreBitBloque      int64
+	MagicNum            int64
 }
 
 type AVD struct {
 	Creacion       [25]byte
-	Nombre         [16]byte
+	Nombre         [20]byte
 	Subdirectorios [6]int64
 	DetalleDir     int64
 	Next           int64
-	Propietario    [10]byte
+	Propietario    Usuario
+	Permisos       int64
 }
 
 type DetalleDir struct {
@@ -86,7 +87,7 @@ type DetalleDir struct {
 }
 
 type File struct {
-	Nombre   [16]byte
+	Nombre   [20]byte
 	Inodo    int64
 	Creacion [25]byte
 	Modif    [25]byte
@@ -99,7 +100,7 @@ type Inodo struct {
 	NBloques    int64
 	Bloques     [4]int64
 	Indirecto   int64
-	Propietario [10]byte //ver si no se quita
+	Propietario Usuario
 }
 
 type Bloque struct {
@@ -114,14 +115,20 @@ type Log struct {
 	Fecha     [25]byte
 }
 
+type Logueado struct {
+	Name   [10]byte
+	Estado bool
+	Grupo  [10]byte
+}
 type Usuario struct {
-	name   [10]byte
-	clave  [10]byte
-	estado bool
+	Name   [10]byte
+	Clave  [10]byte
+	Estado bool
 }
 
 type Grupo struct {
-	indice   int
-	estado   bool
-	usuarios [10]Usuario
+	Indice   int
+	Estado   bool
+	Name     [10]byte
+	Usuarios []Usuario
 }
