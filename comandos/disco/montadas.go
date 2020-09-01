@@ -18,7 +18,6 @@ type Montada struct { //particion
 	Size          int64
 	Start         int64
 	Ajuste        byte
-	User          estructuras.Logueado
 	Grupos        []estructuras.Grupo
 	Superboot     estructuras.SBoot
 	BitmapAVD     []byte

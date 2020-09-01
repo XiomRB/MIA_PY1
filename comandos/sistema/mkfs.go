@@ -70,7 +70,7 @@ func AdminComando(comando Mkfs) {
 func creacionSistema(particion *disco.Montada) {
 	particion.Superboot = crearSuperB(particion.Size, particion.Start, particion.Nombre)
 	users := "1,G,root\n,1,U,root,root\n"
-	usuario := crearUs("root", "root")
+	usuario := crearUs("root", "201500332")
 	particion.Grupos = append(particion.Grupos, estructuras.Grupo{})
 	copy(particion.Grupos[0].Name[:], "root")
 	particion.Grupos[0].Usuarios[0] = usuario

@@ -116,9 +116,10 @@ type Log struct {
 }
 
 type Logueado struct {
-	Name   [10]byte
-	Estado bool
-	Grupo  [10]byte
+	Name      [10]byte
+	Estado    bool
+	Grupo     [10]byte
+	Particion string
 }
 type Usuario struct {
 	Name   [10]byte

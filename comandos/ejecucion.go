@@ -111,7 +111,22 @@ func leerComando(raiz analizador.Nodo) {
 		}
 		sistema.AdminComando(mkfs)
 	case "LOGIN":
+		login := sistema.Login{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarLoguin(raiz.Hijos[i], &login)
+		}
+		sistema.AdminLogin(login)
 	case "LOGOUT":
+		if len(raiz.Hijos) != 0 {
+			fmt.Println("Error: Este comando no recibe parametros")
+		} else {
+			if sistema.LoginUs.Estado {
+				sistema.LoginUs.Estado = false
+			} else {
+				fmt.Println("Error: No hay un usuario logueado")
+			}
+
+		}
 	case "MKGRP":
 	case "RMGRP":
 	case "MKUSR":
@@ -261,5 +276,16 @@ func validarMKFS(raiz analizador.Nodo, comando *sistema.Mkfs) {
 	case "unit":
 		comando.Unit = analizador.ValidarUnidad(true, raiz.Hijos[0])
 
+	}
+}
+
+func validarLoguin(raiz analizador.Nodo, loguin *sistema.Login) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		loguin.Id = raiz.Hijos[0].Dato
+	case "usr":
+		loguin.Usr = raiz.Hijos[0].Dato
+	case "pwd":
+		loguin.Pwd = raiz.Hijos[0].Dato
 	}
 }
