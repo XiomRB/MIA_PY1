@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 	"unsafe"
 )
@@ -20,7 +21,7 @@ type Mkfs struct {
 	Unit string
 }
 
-func EncontrarMontada(id string) (disco.Montada, string) {
+func EncontrarMontada(id string) (int, int, string) { //retorna puntero para que todo se vaya guardando en la particion montada dentro de la lista de discos
 	letra := disco.EncontrarLetra(byte(id[2]))
 	num, err := strconv.Atoi(string(id[3]))
 	if err != nil {
@@ -28,27 +29,41 @@ func EncontrarMontada(id string) (disco.Montada, string) {
 	}
 	if disco.VerifDiscoMontado(letra) {
 		if disco.VerifPartMontada(disco.DiscosMontados[letra], num) {
-			return disco.DiscosMontados[letra].Particiones[num-1], disco.DiscosMontados[letra].Path
+			return letra, num - 1, disco.DiscosMontados[letra].Path
 		}
 	}
-	vacia := disco.Montada{}
-	return vacia, ""
+	return -1, -1, ""
 }
 
 func AdminComando(comando Mkfs) {
 	if len(comando.Id) < 0 {
 		fmt.Println("Error: El parametro id es obligatorio")
 	} else {
-		particion, path := EncontrarMontada(comando.Id)
+		letra, indice, path := EncontrarMontada(comando.Id)
 		if len(comando.Tipo) > 0 {
 			if comando.Add != 0 {
 				fmt.Println("Error, el parametro id y el parametro tipo no pueden ser declarados juntos")
 			} else {
 				if len(path) != 0 {
-					fmt.Println(particion)
-					/*boot := crearSuperB(particion.Size, particion.Start, particion.Nombre)
-					EscribirMKFS(path, particion.Start, boot)
-					EscribirMKFS(path, particion.Start+int64(unsafe.Sizeof(boot)), boot)*/
+					if strings.EqualFold(comando.Tipo, "full") {
+						f, err := os.OpenFile(path, os.O_RDWR, 0755)
+						if err != nil {
+							log.Fatal(err)
+						}
+						f.Seek(int64(disco.DiscosMontados[letra].Particiones[indice].Start), 0)
+						var cero int8 = 0
+						t := int64(unsafe.Sizeof(cero))
+						var binario bytes.Buffer
+						binary.Write(&binario, binary.BigEndian, &cero)
+						for i := int64(0); i <= disco.DiscosMontados[letra].Particiones[indice].Size/t; i += t {
+							disco.EscribirBytes(f, binario.Bytes())
+						}
+						f.Close()
+					}
+					creacionSistema(&disco.DiscosMontados[letra].Particiones[indice])
+					disco.EscribirSB(path, disco.DiscosMontados[letra].Particiones[indice].Start, disco.DiscosMontados[letra].Particiones[indice].Superboot)
+					disco.EscribirSB(path, disco.DiscosMontados[letra].Particiones[indice].Start+int64(unsafe.Sizeof(disco.DiscosMontados[letra].Particiones[indice].Superboot)), disco.DiscosMontados[letra].Particiones[indice].Superboot)
+					fmt.Println("Sistema de archivos creado")
 				} else {
 					fmt.Println("Error: la particion no ha sido montada")
 				}
@@ -58,7 +73,7 @@ func AdminComando(comando Mkfs) {
 				fmt.Println("Error: el parametro add recibe cualquier numero excepto 0")
 			} else {
 				if len(path) != 0 {
-
+					fmt.Println("Error: No se pude agregar el espacio deseado a la particion")
 				} else {
 					fmt.Println("Error: la particion no ha sido montada")
 				}
@@ -69,11 +84,12 @@ func AdminComando(comando Mkfs) {
 
 func creacionSistema(particion *disco.Montada) {
 	particion.Superboot = crearSuperB(particion.Size, particion.Start, particion.Nombre)
-	users := "1,G,root\n,1,U,root,root\n"
+	users := "1,G,root\n,1,U,root,201500332\n"
 	usuario := crearUs("root", "201500332")
 	particion.Grupos = append(particion.Grupos, estructuras.Grupo{})
 	copy(particion.Grupos[0].Name[:], "root")
-	particion.Grupos[0].Usuarios[0] = usuario
+	particion.Grupos[0].Estado = true
+	particion.Grupos[0].Usuarios = append(particion.Grupos[0].Usuarios, usuario)
 	bitmaparbol := make([]byte, particion.Superboot.NoArbolVirtual)
 	bitmaparbol[0] = 1
 	bitmapdetalle := make([]byte, particion.Superboot.NoDetalleDirectorio)
@@ -180,6 +196,7 @@ func crearUs(name, pass string) estructuras.Usuario {
 	us := estructuras.Usuario{}
 	copy(us.Name[:], name)
 	copy(us.Clave[:], pass)
+	us.Estado = true
 	return us
 }
 
@@ -225,16 +242,6 @@ func crearAVD(name string, user estructuras.Usuario, permisos int64) estructuras
 	return avd
 }
 
-/*
-func UsuarioLogueado(name, grup, clave string) estructuras.Usuario {
-	usuario := estructuras.Usuario{}
-	copy(usuario.Name[:], name)
-	copy(usuario.Grupo[:], grup)
-	copy(usuario.Clave[:], clave)
-	usuario.Estado = true
-	return usuario
-}*/
-
 func crearFile(name string, inodo int64) estructuras.File {
 	file := estructuras.File{}
 	copy(file.Nombre[:], "users.txt")
@@ -248,13 +255,16 @@ func EscribirBloques(texto string, n int64) []estructuras.Bloque { ///asigna tex
 	bloques := make([]estructuras.Bloque, n)
 	nb := 0
 	c := 0
+	fmt.Println(len(texto))
 	for i := 0; i < len(texto); i++ {
-		bloques[nb].Text[c] = byte(texto[i])
-		c++
-		if i%24 == 0 {
+		if i%25 == 0 && i > 0 {
+			fmt.Println(i%25, " ", i)
 			c = 0
 			nb++
 		}
+		bloques[nb].Text[c] = byte(texto[i])
+		c++
+
 	}
 	return bloques
 }

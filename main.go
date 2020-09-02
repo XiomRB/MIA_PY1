@@ -1,18 +1,13 @@
 package main
 
-import (
-	"Archivos/PY1/comandos/disco"
-	"Archivos/PY1/estructuras"
-	"fmt"
-	"unsafe"
-)
+import "Archivos/PY1/comandos"
 
 func main() {
 
-	/*Path := "exec -path->/home/gabriela/Documentos/entrada2.mia"
+	Path := "exec -path->/home/gabriela/Documentos/entrada2.mia"
 
 	comandos.Ejecutar(Path)
-	*/n := 10
+	/*n := 10
 	bloques := make([]estructuras.Bloque, n)
 
 	var a [10]estructuras.Bloque
@@ -24,5 +19,5 @@ func main() {
 
 	m := disco.Montada{}
 	fmt.Println(unsafe.Sizeof(m))
-	fmt.Println(unsafe.Sizeof(disco.DiscosMontados))
+	fmt.Println(unsafe.Sizeof(disco.DiscosMontados))*/
 }

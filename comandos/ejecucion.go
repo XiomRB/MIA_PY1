@@ -128,9 +128,31 @@ func leerComando(raiz analizador.Nodo) {
 
 		}
 	case "MKGRP":
+		grp := sistema.Grp{}
+		grp.Accion = true
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validargrup(raiz.Hijos[i], &grp)
+		}
+		sistema.AdminGrupos(grp)
 	case "RMGRP":
+		grp := sistema.Grp{}
+		grp.Accion = false
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validargrup(raiz.Hijos[i], &grp)
+		}
+		sistema.AdminGrupos(grp)
 	case "MKUSR":
+		mkusr := sistema.Mkusr{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarmkusr(raiz.Hijos[i], &mkusr)
+		}
+		sistema.CrearUsuario(mkusr)
 	case "RMUSR":
+		rmusr := sistema.Rmusr{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarrmusr(raiz.Hijos[i], &rmusr)
+		}
+		sistema.EliminarUsuario(rmusr)
 	case "CHMOD":
 	case "MKFILE":
 	case "CAT":
@@ -287,5 +309,36 @@ func validarLoguin(raiz analizador.Nodo, loguin *sistema.Login) {
 		loguin.Usr = raiz.Hijos[0].Dato
 	case "pwd":
 		loguin.Pwd = raiz.Hijos[0].Dato
+	}
+}
+
+func validargrup(raiz analizador.Nodo, comando *sistema.Grp) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		comando.Id = raiz.Hijos[0].Dato
+	case "name":
+		comando.Name = raiz.Hijos[0].Dato
+	}
+}
+
+func validarmkusr(raiz analizador.Nodo, comando *sistema.Mkusr) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		comando.Id = raiz.Hijos[0].Dato
+	case "grp":
+		comando.Grp = raiz.Hijos[0].Dato
+	case "pwd":
+		comando.Pwd = raiz.Hijos[0].Dato
+	case "urs":
+		comando.Usr = raiz.Hijos[0].Dato
+	}
+}
+
+func validarrmusr(raiz analizador.Nodo, comando *sistema.Rmusr) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		comando.Id = raiz.Hijos[0].Dato
+	case "urs":
+		comando.Usr = raiz.Hijos[0].Dato
 	}
 }
