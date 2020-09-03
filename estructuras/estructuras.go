@@ -77,8 +77,8 @@ type AVD struct {
 	Subdirectorios [6]int64
 	DetalleDir     int64
 	Next           int64
-	Propietario    Usuario
-	Permisos       int64
+	Prop           Propietario
+	Permisos       [3]byte
 }
 
 type DetalleDir struct {
@@ -91,16 +91,16 @@ type File struct {
 	Inodo    int64
 	Creacion [25]byte
 	Modif    [25]byte
-	//Permiso int8
+	Permisos [3]byte
+	Prop     Propietario
 }
 
 type Inodo struct {
-	Indice      int64
-	Size        int64
-	NBloques    int64
-	Bloques     [4]int64
-	Indirecto   int64
-	Propietario Usuario
+	Indice    int64
+	Size      int64
+	NBloques  int64
+	Bloques   [4]int64
+	Indirecto int64
 }
 
 type Bloque struct {
@@ -120,6 +120,11 @@ type Logueado struct {
 	Estado    bool
 	Grupo     [10]byte
 	Particion string
+}
+
+type Propietario struct {
+	Name  [10]byte
+	Grupo [10]byte
 }
 type Usuario struct {
 	Name   [10]byte

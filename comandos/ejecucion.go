@@ -146,6 +146,7 @@ func leerComando(raiz analizador.Nodo) {
 		for i := 0; i < len(raiz.Hijos); i++ {
 			validarmkusr(raiz.Hijos[i], &mkusr)
 		}
+		fmt.Println("entro en mjusr ", mkusr.Usr)
 		sistema.CrearUsuario(mkusr)
 	case "RMUSR":
 		rmusr := sistema.Rmusr{}
@@ -329,7 +330,7 @@ func validarmkusr(raiz analizador.Nodo, comando *sistema.Mkusr) {
 		comando.Grp = raiz.Hijos[0].Dato
 	case "pwd":
 		comando.Pwd = raiz.Hijos[0].Dato
-	case "urs":
+	case "usr":
 		comando.Usr = raiz.Hijos[0].Dato
 	}
 }
@@ -338,7 +339,31 @@ func validarrmusr(raiz analizador.Nodo, comando *sistema.Rmusr) {
 	switch strings.ToLower(raiz.Dato) {
 	case "id":
 		comando.Id = raiz.Hijos[0].Dato
-	case "urs":
+	case "usr":
 		comando.Usr = raiz.Hijos[0].Dato
+	}
+}
+
+func validarmkdir(raiz analizador.Nodo, mkdir *sistema.Mkdir) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		mkdir.Id = raiz.Hijos[0].Dato
+	case "path":
+		mkdir.Path = raiz.Hijos[0].Dato
+	case "p":
+		mkdir.Padre = true
+	}
+}
+
+func validarchmod(raiz analizador.Nodo, chmod *sistema.Chmod) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		chmod.Id = raiz.Hijos[0].Dato
+	case "path":
+		chmod.Path = raiz.Hijos[0].Dato
+	case "r":
+		chmod.R = true
+	case "ugo":
+		chmod.Ugo = 
 	}
 }

@@ -98,7 +98,9 @@ func creacionSistema(particion *disco.Montada) {
 	bitmapinodo[0] = 1
 	file := crearFile("users.txt", particion.Superboot.InicioInodo)
 	detalle := estructuras.DetalleDir{}
-	avd := crearAVD("/", usuario, 770)
+	avd := crearAVD("/")
+	avd.Prop.Name = usuario.Name
+	avd.Prop.Grupo = usuario.Name
 	avd.DetalleDir = particion.Superboot.InicioDetalleDirec
 	detalle.Files[0] = file
 	inodo := CrearInodo(1, int64(len(users)))
@@ -233,12 +235,15 @@ func DarHora() string {
 	return string(t.Format("Mon Jan _2 15:04:05 2006"))
 }
 
-func crearAVD(name string, user estructuras.Usuario, permisos int64) estructuras.AVD {
+func crearAVD(name string) estructuras.AVD {
 	avd := estructuras.AVD{}
 	copy(avd.Creacion[:], DarHora())
 	copy(avd.Nombre[:], name)
-	avd.Propietario = user
-	avd.Permisos = permisos
+	avd.Prop.Name = LoginUs.Name
+	avd.Prop.Grupo = LoginUs.Grupo
+	avd.Permisos[0] = 6
+	avd.Permisos[1] = 4
+	avd.Permisos[2] = 4
 	return avd
 }
 
@@ -248,6 +253,12 @@ func crearFile(name string, inodo int64) estructuras.File {
 	copy(file.Creacion[:], DarHora())
 	copy(file.Modif[:], DarHora())
 	file.Inodo = inodo
+	file.Permisos[0] = 6
+	file.Permisos[1] = 4
+	file.Permisos[2] = 4
+	file.Prop = estructuras.Propietario{}
+	file.Prop.Name = LoginUs.Name
+	file.Prop.Grupo = LoginUs.Grupo
 	return file
 }
 
