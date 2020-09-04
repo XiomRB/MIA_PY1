@@ -161,6 +161,11 @@ func leerComando(raiz analizador.Nodo) {
 	case "EDIT":
 	case "REN":
 	case "MKDIR":
+		mkdir := sistema.Mkdir{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarmkdir(raiz.Hijos[i], &mkdir)
+		}
+		sistema.AdminCarpetas(mkdir)
 	case "CP":
 	case "MV":
 	case "FIND":
@@ -364,6 +369,6 @@ func validarchmod(raiz analizador.Nodo, chmod *sistema.Chmod) {
 	case "r":
 		chmod.R = true
 	case "ugo":
-		chmod.Ugo = 
+		chmod.Ugo = raiz.Hijos[0].Dato
 	}
 }

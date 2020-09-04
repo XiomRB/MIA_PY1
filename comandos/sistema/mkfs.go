@@ -98,7 +98,7 @@ func creacionSistema(particion *disco.Montada) {
 	bitmapinodo[0] = 1
 	file := crearFile("users.txt", particion.Superboot.InicioInodo)
 	detalle := estructuras.DetalleDir{}
-	avd := crearAVD("/")
+	avd := CrearAVD("/")
 	avd.Prop.Name = usuario.Name
 	avd.Prop.Grupo = usuario.Name
 	avd.DetalleDir = particion.Superboot.InicioDetalleDirec
@@ -235,7 +235,7 @@ func DarHora() string {
 	return string(t.Format("Mon Jan _2 15:04:05 2006"))
 }
 
-func crearAVD(name string) estructuras.AVD {
+func CrearAVD(name string) estructuras.AVD {
 	avd := estructuras.AVD{}
 	copy(avd.Creacion[:], DarHora())
 	copy(avd.Nombre[:], name)
