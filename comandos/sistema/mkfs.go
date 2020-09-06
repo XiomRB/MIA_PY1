@@ -96,8 +96,9 @@ func creacionSistema(particion *disco.Montada) {
 	bitmapdetalle[0] = 1
 	bitmapinodo := make([]byte, particion.Superboot.NoInodos)
 	bitmapinodo[0] = 1
-	file := crearFile("users.txt", particion.Superboot.InicioInodo)
+	file := CrearFile("users.txt", particion.Superboot.InicioInodo)
 	detalle := estructuras.DetalleDir{}
+	detalle.Next = -1
 	avd := CrearAVD("/")
 	avd.Prop.Name = usuario.Name
 	avd.Prop.Grupo = usuario.Name
@@ -134,6 +135,7 @@ func CrearInodo(indice int64, size int64) estructuras.Inodo {
 	inodo := estructuras.Inodo{}
 	inodo.Indice = indice
 	inodo.Size = size
+	inodo.Indirecto = -1
 	if inodo.Size%25 == 0 {
 		inodo.NBloques = inodo.Size / 25
 	} else {
@@ -244,10 +246,11 @@ func CrearAVD(name string) estructuras.AVD {
 	avd.Permisos[0] = 6
 	avd.Permisos[1] = 4
 	avd.Permisos[2] = 4
+	avd.IndiceDD = -1
 	return avd
 }
 
-func crearFile(name string, inodo int64) estructuras.File {
+func CrearFile(name string, inodo int64) estructuras.File {
 	file := estructuras.File{}
 	copy(file.Nombre[:], "users.txt")
 	copy(file.Creacion[:], DarHora())
@@ -266,16 +269,13 @@ func EscribirBloques(texto string, n int64) []estructuras.Bloque { ///asigna tex
 	bloques := make([]estructuras.Bloque, n)
 	nb := 0
 	c := 0
-	fmt.Println(len(texto))
 	for i := 0; i < len(texto); i++ {
 		if i%25 == 0 && i > 0 {
-			fmt.Println(i%25, " ", i)
 			c = 0
 			nb++
 		}
 		bloques[nb].Text[c] = byte(texto[i])
 		c++
-
 	}
 	return bloques
 }
