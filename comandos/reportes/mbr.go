@@ -101,6 +101,14 @@ func extraerNombre(nombre [16]byte) string {
 	return n
 }
 
+func extraerStr(nombre [20]byte) string {
+	n := ""
+	for i := 0; nombre[i] != 0; i++ {
+		n += string(nombre[i])
+	}
+	return n
+}
+
 func intString(i int64) string {
 	num := strconv.Itoa(int(i))
 	return num

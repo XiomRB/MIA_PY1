@@ -34,12 +34,12 @@ func CrearArchivo(comando Mkfile, part *disco.Montada, crear bool) {
 	}
 	var nameFile [20]byte
 	copy(nameFile[:], lista[len(lista)-1])
-	carpeta := BuscarCarpeta(direc, part, crear)
+	carpeta := BuscarCarpeta(direc, part, crear) //se busca la carpeta donde se creara el archivo
 	indiceDet := 0
 	indiceFile := 0
 	if carpeta >= 0 {
 		if part.AVD[carpeta].IndiceDD != -1 {
-			indiceDet, indiceFile = EncontrarDetalle(nameFile, part, int(part.AVD[carpeta].IndiceDD))
+			indiceDet, indiceFile = EncontrarDetalle(nameFile, part, int(part.AVD[carpeta].IndiceDD)) //encuentra el detalle de directorio de la carpeta elegida
 		} else {
 			nuevoDet := estructuras.DetalleDir{}
 			nuevoDet.Next = -1
@@ -59,9 +59,14 @@ func CrearArchivo(comando Mkfile, part *disco.Montada, crear bool) {
 			indiceDet = j
 			indiceFile = 0
 		}
+		if part.DD[indiceDet].Files[indiceFile].Nombre == nameFile {
+			fmt.Println("El archivo ya existe")
+			return
+		}
+		part.DD[indiceDet].Files[indiceFile] = CrearFile(lista[len(lista)-1], -1)
 		nb := 0
 		if comando.Size > 0 {
-			if comando.Size%100 == 0 {
+			if comando.Size%100 == 0 { //se divide entre 100 ya que son 100 caracteres los que le caben a cada inodo
 				nb = int(comando.Size) / 100
 			} else {
 				nb = (int(comando.Size) / 100) + 1
@@ -87,24 +92,54 @@ func CrearArchivo(comando Mkfile, part *disco.Montada, crear bool) {
 			for i := 0; i < nb-1; i++ {
 				part.Inodos[i].Indirecto = part.Inodos[i+1].Indice
 			}
-		}
-		longitud := int(comando.Size) - len(comando.Cont)
-		abc := "abcdefghijklmnopqrstuvwxyz"
-		l := 0
-		for i := len(comando.Cont); i < longitud; i++ { //se crea la cadena a escribir en el archivo
-			if l == len(abc)-1 {
-				l = 0
+			longitud := int(comando.Size) - len(comando.Cont)
+			abc := "abcdefghijklmnopqrstuvwxyz"
+			l := 0
+			for i := len(comando.Cont); i < longitud; i++ { //se crea la cadena a escribir en el archivo
+				if l == len(abc)-1 {
+					l = 0
+				}
+				comando.Cont += string(abc[l])
+				l++
 			}
-			comando.Cont += string(abc[l])
-			l++
+			EscribirArchivo(comando, part.Inodos[ids[0]].NBloques, part, ids)
+			part.DD[indiceDet].Files[indiceFile].Inodo = int64(ids[0])
 		}
-		bloques := EscribirBloques(comando.Cont, int64(nb))
+		fmt.Println("Archivo creado")
 	}
-
 }
 
-func EscribirArchivo() {
-
+func EscribirArchivo(comando Mkfile, nb int64, part *disco.Montada, inodos []int) {
+	bloques := EscribirBloques(comando.Cont, int64(nb))
+	b := 0
+	bb := make([]int, len(bloques))
+	for i := 0; i < len(bloques); i++ {
+		for b < len(part.BitmapBloques) {
+			if part.BitmapBloques[b] == 0 {
+				part.BitmapBloques[b] = 1
+				part.BB[b] = bloques[i]
+				bb[i] = b
+				break
+			}
+			b++
+		}
+		if b >= len(part.BitmapBloques) {
+			part.BitmapBloques = append(part.BitmapBloques, 1)
+			part.BB = append(part.BB, bloques[i])
+			bb[i] = len(part.BitmapBloques) - 1
+			b++
+		}
+	}
+	block := 0
+	ids := 0
+	for i := 0; i < len(bb); i++ {
+		if i > 0 && i%4 == 0 {
+			block = 0
+			ids++
+		}
+		part.Inodos[inodos[ids]].Bloques[block] = int64(bb[i])
+		block++
+	}
 }
 
 func EncontrarDetalle(arch [20]byte, part *disco.Montada, indice int) (int, int) { //retorna detalle e indice de archivo en el detalle

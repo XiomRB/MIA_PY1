@@ -11,13 +11,6 @@ import (
 	"unsafe"
 )
 
-type Reporte struct {
-	Name string
-	Path string
-	Id   string
-	Ruta string
-}
-
 func crearGraphExt(ext estructuras.Particion, path string, size int64) string {
 	n := ""
 	for j := 0; ext.Name[j] != 0; j++ {

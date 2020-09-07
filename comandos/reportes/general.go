@@ -8,12 +8,21 @@ import (
 	"strings"
 )
 
+type Reporte struct {
+	Name string
+	Path string
+	Id   string
+	Ruta string
+}
+
 func AdministrarReportes(comando Reporte) {
 	switch strings.ToLower(comando.Name) {
 	case "mbr":
 		fmt.Println(Reportar(comando, RepMBR(comando)))
 	case "disk":
 		fmt.Println(Reportar(comando, RepDisk(comando)))
+	case "sb":
+		fmt.Println(Reportar(comando, RepSB(comando)))
 	}
 }
 

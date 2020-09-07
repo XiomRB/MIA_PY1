@@ -252,7 +252,7 @@ func CrearAVD(name string) estructuras.AVD {
 
 func CrearFile(name string, inodo int64) estructuras.File {
 	file := estructuras.File{}
-	copy(file.Nombre[:], "users.txt")
+	copy(file.Nombre[:], name)
 	copy(file.Creacion[:], DarHora())
 	copy(file.Modif[:], DarHora())
 	file.Inodo = inodo
