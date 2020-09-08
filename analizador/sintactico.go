@@ -67,8 +67,10 @@ func param() Nodo {
 	if preanalisis.tipo == 0 {
 		match(0, 0)
 		nuevo = match(3, 5) //5 parametro
-		match(5, 5)
-		nuevo.Hijos = append(nuevo.Hijos, p())
+		if preanalisis.tipo == 5 {
+			match(5, 5)
+			nuevo.Hijos = append(nuevo.Hijos, p())
+		}
 	} else {
 		imprimirErrorSint(0)
 	}
@@ -88,6 +90,15 @@ func lp() []Nodo {
 	}
 	return lista
 }
+
+/*func hijos()Nodo{
+	nuevo := CrearNodo(preanalisis.lexema, preanalisis.tipo, preanalisis.linea, preanalisis.columna)
+	if preanalisis.tipo == 5{
+		match(5, 5)
+		return p()
+	}
+	return null
+}*/
 
 func p() Nodo {
 	nuevo := CrearNodo(preanalisis.lexema, preanalisis.tipo, preanalisis.linea, preanalisis.columna)

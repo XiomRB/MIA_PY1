@@ -29,9 +29,13 @@ func CrearNodo(v string, tipo int8, l, c int) Nodo {
 
 //Imprimir comando
 func Imprimir(raiz Nodo) {
-	fmt.Print(raiz.Dato)
+	fmt.Print(raiz.Dato, " ")
 	for i := 0; i < len(raiz.Hijos); i++ {
-		fmt.Print(raiz.Hijos[i].Dato, "->", raiz.Hijos[i].Hijos[0].Dato)
+		if len(raiz.Hijos[i].Hijos) > 0 {
+			fmt.Print(raiz.Hijos[i].Dato, "->", raiz.Hijos[i].Hijos[0].Dato, "  ")
+		} else {
+			fmt.Print(raiz.Hijos[i].Dato, "  ")
+		}
 	}
 	fmt.Println("")
 }

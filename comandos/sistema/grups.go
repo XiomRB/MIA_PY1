@@ -68,8 +68,8 @@ func EliminarUsuario(comando Rmusr) {
 	var usr [10]byte
 	copy(usr[:], comando.Usr)
 	if LoginUs.Estado && LoginUs.Name == root {
-		letra, indice, path := EncontrarMontada(comando.Id)
-		if len(path) == 0 {
+		letra, indice := EncontrarMontada(comando.Id)
+		if letra == -1 {
 			fmt.Println("Error, la particion no ha sido montada")
 		} else {
 			for i := 0; i < len(disco.DiscosMontados[letra].Particiones[indice].Grupos); i++ {
@@ -100,8 +100,8 @@ func CrearUsuario(comando Mkusr) {
 	copy(usuario.Name[:], comando.Usr)
 	copy(usuario.Clave[:], comando.Pwd)
 	if LoginUs.Estado && LoginUs.Name == root {
-		letra, indice, path := EncontrarMontada(comando.Id)
-		if len(path) == 0 {
+		letra, indice := EncontrarMontada(comando.Id)
+		if letra == -1 {
 			fmt.Println("Error, la particion no ha sido montada")
 		} else {
 			for i := 0; i < len(disco.DiscosMontados[letra].Particiones[indice].Grupos); i++ {
@@ -128,8 +128,8 @@ func loguearse(comando Login) {
 	if LoginUs.Estado {
 		fmt.Println("Error: Hay un usuario que aun no ha cerrado sesion")
 	} else {
-		letra, indice, path := EncontrarMontada(comando.Id)
-		if len(path) == 0 {
+		letra, indice := EncontrarMontada(comando.Id)
+		if letra == -1 {
 			fmt.Println("Error: La particion no se encuentra montada")
 		} else {
 			var usr [10]byte
@@ -173,8 +173,8 @@ func AdminGrupos(comando Grp) {
 	if usr == LoginUs.Name && LoginUs.Estado {
 		if len(comando.Id) != 0 {
 			if len(comando.Name) != 0 {
-				letra, indice, path := EncontrarMontada(comando.Id)
-				if len(path) == 0 {
+				letra, indice := EncontrarMontada(comando.Id)
+				if letra == -1 {
 					fmt.Println("Error: La particion no ha sido montada")
 				} else {
 					if comando.Accion { //si el comando es mkgrp

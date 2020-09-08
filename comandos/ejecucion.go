@@ -174,6 +174,7 @@ func leerComando(raiz analizador.Nodo) {
 	case "LOSS":
 	case "RECOVERY":
 	case "REP":
+		fmt.Println("entr con rep")
 		reporte := reportes.Reporte{}
 		for i := 0; i < len(raiz.Hijos); i++ {
 			validarRep(raiz.Hijos[i], &reporte)

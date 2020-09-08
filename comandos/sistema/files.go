@@ -21,7 +21,7 @@ func AdminMkFile(comando Mkfile) {
 	} else if len(comando.Path) == 0 {
 		fmt.Println("Error: el parametro path es obligatorio")
 	} else {
-		letra, indice, path := EncontrarMontada(comando.Id)
+		//letra, indice := EncontrarMontada(comando.Id)
 	}
 }
 

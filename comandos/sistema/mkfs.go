@@ -21,7 +21,7 @@ type Mkfs struct {
 	Unit string
 }
 
-func EncontrarMontada(id string) (int, int, string) { //retorna puntero para que todo se vaya guardando en la particion montada dentro de la lista de discos
+func EncontrarMontada(id string) (int, int) { //retorna puntero para que todo se vaya guardando en la particion montada dentro de la lista de discos
 	letra := disco.EncontrarLetra(byte(id[2]))
 	num, err := strconv.Atoi(string(id[3]))
 	if err != nil {
@@ -29,24 +29,24 @@ func EncontrarMontada(id string) (int, int, string) { //retorna puntero para que
 	}
 	if disco.VerifDiscoMontado(letra) {
 		if disco.VerifPartMontada(disco.DiscosMontados[letra], num) {
-			return letra, num - 1, disco.DiscosMontados[letra].Path
+			return letra, num - 1
 		}
 	}
-	return -1, -1, ""
+	return -1, -1
 }
 
 func AdminComando(comando Mkfs) {
 	if len(comando.Id) < 0 {
 		fmt.Println("Error: El parametro id es obligatorio")
 	} else {
-		letra, indice, path := EncontrarMontada(comando.Id)
+		letra, indice := EncontrarMontada(comando.Id)
 		if len(comando.Tipo) > 0 {
 			if comando.Add != 0 {
 				fmt.Println("Error, el parametro id y el parametro tipo no pueden ser declarados juntos")
 			} else {
-				if len(path) != 0 {
+				if letra != -1 {
 					if strings.EqualFold(comando.Tipo, "full") {
-						f, err := os.OpenFile(path, os.O_RDWR, 0755)
+						f, err := os.OpenFile(disco.DiscosMontados[letra].Path, os.O_RDWR, 0755)
 						if err != nil {
 							log.Fatal(err)
 						}
@@ -61,8 +61,9 @@ func AdminComando(comando Mkfs) {
 						f.Close()
 					}
 					creacionSistema(&disco.DiscosMontados[letra].Particiones[indice])
-					disco.EscribirSB(path, disco.DiscosMontados[letra].Particiones[indice].Start, disco.DiscosMontados[letra].Particiones[indice].Superboot)
-					disco.EscribirSB(path, disco.DiscosMontados[letra].Particiones[indice].Start+int64(unsafe.Sizeof(disco.DiscosMontados[letra].Particiones[indice].Superboot)), disco.DiscosMontados[letra].Particiones[indice].Superboot)
+					fmt.Println(len(disco.DiscosMontados[letra].Particiones[indice].AVD))
+					//disco.EscribirSB(path, disco.DiscosMontados[letra].Particiones[indice].Start, disco.DiscosMontados[letra].Particiones[indice].Superboot)
+					//disco.EscribirSB(path, disco.DiscosMontados[letra].Particiones[indice].Start+int64(unsafe.Sizeof(disco.DiscosMontados[letra].Particiones[indice].Superboot)), disco.DiscosMontados[letra].Particiones[indice].Superboot)
 					fmt.Println("Sistema de archivos creado")
 				} else {
 					fmt.Println("Error: la particion no ha sido montada")
@@ -72,7 +73,7 @@ func AdminComando(comando Mkfs) {
 			if comando.Add == 0 {
 				fmt.Println("Error: el parametro add recibe cualquier numero excepto 0")
 			} else {
-				if len(path) != 0 {
+				if letra != -1 {
 					fmt.Println("Error: No se pude agregar el espacio deseado a la particion")
 				} else {
 					fmt.Println("Error: la particion no ha sido montada")
@@ -96,18 +97,18 @@ func creacionSistema(particion *disco.Montada) {
 	bitmapdetalle[0] = 1
 	bitmapinodo := make([]byte, particion.Superboot.NoInodos)
 	bitmapinodo[0] = 1
-	file := CrearFile("users.txt", particion.Superboot.InicioInodo)
+	file := CrearFile("users.txt", 0)
 	detalle := estructuras.DetalleDir{}
 	detalle.Next = -1
 	avd := CrearAVD("/")
 	avd.Prop.Name = usuario.Name
 	avd.Prop.Grupo = usuario.Name
-	avd.DetalleDir = particion.Superboot.InicioDetalleDirec
+	avd.IndiceDD = 0
 	detalle.Files[0] = file
 	inodo := CrearInodo(1, int64(len(users)))
 	particion.Inodos = append(particion.Inodos, inodo)
 	particion.DD = append(particion.DD, detalle)
-	particion.AVD = append(particion.AVD)
+	particion.AVD = append(particion.AVD, avd)
 	bloques := EscribirBloques(users, inodo.NBloques)
 	for i := 0; i < len(bloques); i++ {
 		inodo.Bloques[i] = particion.Superboot.InicioBloque + int64(i*int(unsafe.Sizeof(bloques[i])))
@@ -203,34 +204,6 @@ func crearUs(name, pass string) estructuras.Usuario {
 	us.Estado = true
 	return us
 }
-
-/*func crearRoot(ind, bloque int64) {
-	var escrito [33]byte
-	copy(escrito[:], "1,G,root\n1,U,root,root,201500332\n")
-	var inodo estructuras.Inodo
-	inodo.Indice = 1
-	inodo.Size = int64(len(escrito))
-	inodo.NBloques = inodo.Size/25 + 1
-	var bloques []estructuras.Bloque
-	for i := int64(0); i < inodo.NBloques; i++ {
-		bloques = append(bloques, estructuras.Bloque{})
-		inodo.Bloques[i] = bloque + int64(25*i)
-	}
-	nb := 0
-	bit := 0
-	for i := 0; i < len(escrito); i++ {
-		bloques[nb].Text[bit] = escrito[i]
-		if i%24 == 0 {
-			nb++
-			bit = 0
-		}
-	}
-	usuario := UsuarioLogueado("root", "root", "201500332")
-	avd := crearAVD("/", usuario, 770)
-	file := crearFile("users.txt", ind)
-	detalle := estructuras.DetalleDir{}
-
-}*/
 
 func DarHora() string {
 	t := time.Now()

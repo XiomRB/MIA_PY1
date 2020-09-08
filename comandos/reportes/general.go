@@ -23,6 +23,9 @@ func AdministrarReportes(comando Reporte) {
 		fmt.Println(Reportar(comando, RepDisk(comando)))
 	case "sb":
 		fmt.Println(Reportar(comando, RepSB(comando)))
+	case "directorio":
+		fmt.Println("estoy aqui")
+		fmt.Println(Reportar(comando, RepDirectory(comando)))
 	}
 }
 

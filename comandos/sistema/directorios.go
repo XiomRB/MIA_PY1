@@ -17,21 +17,42 @@ func CrearCarpeta(particion *disco.Montada, nombre string, padre int) int { //el
 	apa := 0
 	if LoginUs.Name == particion.AVD[padre].Prop.Name { //verifica que sea el propietario
 		index, apa = EncontrarSubVacio(padre, particion)
-		particion.AVD[padre].IndicesSubs[index] = int64(NuevoDirectorio(particion, nombre, apa))
-		return int(particion.AVD[padre].IndicesSubs[index])
+		if apa == -1 {
+			return apa
+		}
+		nvd := NuevoDirectorio(particion, nombre, apa)
+		if nvd == -1 {
+			return -1
+		}
+		particion.AVD[padre].IndicesSubs[index] = int64(nvd)
+		return nvd
 	} else if LoginUs.Grupo == particion.AVD[padre].Prop.Grupo {
 		if strings.Contains(VerificarPermisos(particion.AVD[padre].Permisos[1]), "w") {
 			index, apa = EncontrarSubVacio(padre, particion)
-			particion.AVD[padre].IndicesSubs[index] = int64(NuevoDirectorio(particion, nombre, apa))
-			return int(particion.AVD[padre].IndicesSubs[index])
+			if apa == -1 {
+				return apa
+			}
+			nvd := NuevoDirectorio(particion, nombre, apa)
+			if nvd == -1 {
+				return -1
+			}
+			particion.AVD[padre].IndicesSubs[index] = int64(nvd)
+			return nvd
 		} else {
 			fmt.Println("Error: no tiene los permisos, para crear carpetas, en la ruta especificada")
 			return -1
 		}
 	} else if strings.Contains(VerificarPermisos(particion.AVD[padre].Permisos[2]), "w") {
 		index, apa = EncontrarSubVacio(padre, particion)
-		particion.AVD[padre].IndicesSubs[index] = int64(NuevoDirectorio(particion, nombre, apa))
-		return int(particion.AVD[padre].IndicesSubs[index])
+		if apa == -1 {
+			return apa
+		}
+		nvd := NuevoDirectorio(particion, nombre, apa)
+		if nvd == -1 {
+			return -1
+		}
+		particion.AVD[padre].IndicesSubs[index] = int64(nvd)
+		return nvd
 	} else {
 		fmt.Println("Error: no tiene los permisos, para crear carpetas, en la ruta especificada")
 		return -1
@@ -43,14 +64,18 @@ func NuevoDirectorio(part *disco.Montada, nombre string, padre int) int {
 	i := 0
 	for i = 0; i < len(part.BitmapAVD); i++ {
 		if part.BitmapAVD[i] == 0 {
-			part.AVD[i] = avd //si hay uno directorio vacio se introduce el nuevo
+			if i == len(part.AVD) {
+				part.AVD = append(part.AVD, avd)
+			} else {
+				part.AVD[i] = avd //si hay uno directorio vacio se introduce el nuevo
+			}
 			part.BitmapAVD[i] = 1
 			break
 		}
 	}
 	if i == len(part.BitmapAVD) {
-		part.AVD = append(part.AVD, avd) //si no hay vacios se crea uno nuevo
-		part.BitmapAVD = append(part.BitmapAVD, 1)
+		fmt.Println("Error, ya creo el numero maximo de directorios")
+		return -1
 	}
 	return i
 }
@@ -62,8 +87,8 @@ func AdminCarpetas(comando Mkdir) {
 		fmt.Println("Error: el parametro path es obligatorio")
 	} else {
 		if LoginUs.Estado {
-			letra, indice, path := EncontrarMontada(comando.Id)
-			if len(path) != 0 {
+			letra, indice := EncontrarMontada(comando.Id)
+			if letra != -1 {
 				decision := BuscarCarpeta(comando.Path, &disco.DiscosMontados[letra].Particiones[indice], comando.Padre)
 				if decision == -2 {
 					fmt.Println("Error: Hay carpetas padre que no existe")
@@ -96,6 +121,8 @@ func BuscarCarpeta(path string, particion *disco.Montada, crear bool) int {
 				break
 			}
 		}
+	} else if i == len(lista)-1 {
+		padre = CrearCarpeta(particion, lista[len(lista)-1], indice)
 	} else {
 		return -2
 	}
@@ -136,14 +163,18 @@ func EncontrarSubVacio(padre int, part *disco.Montada) (int, int) {
 			j := 0
 			for j = 0; j < len(part.BitmapAVD); j++ {
 				if part.BitmapAVD[j] == 0 {
+					if j == len(part.AVD) {
+						part.AVD = append(part.AVD, avd)
+					} else {
+						part.AVD[j] = avd
+					}
 					part.BitmapAVD[j] = 1
-					part.AVD[j] = avd
 					break
 				}
 			}
 			if j == len(part.BitmapAVD) {
-				part.BitmapAVD = append(part.BitmapAVD, 1)
-				part.AVD = append(part.AVD, avd) //creo el anexo del directorio padre para que pueda tener mas subcarpetas
+				fmt.Println("Error: ya ha creado la cantidad maxima de directorios")
+				return 0, -1
 			}
 			part.AVD[padre].IndiceNext = int64(j) //le asigno el indice del anexo al next del padre
 			i = 0

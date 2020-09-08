@@ -72,16 +72,13 @@ type SBoot struct {
 }
 
 type AVD struct {
-	Creacion       [25]byte
-	Nombre         [20]byte
-	Subdirectorios [6]int64
-	IndicesSubs    [6]int64
-	DetalleDir     int64
-	IndiceDD       int64
-	Next           int64
-	IndiceNext     int64
-	Prop           Propietario
-	Permisos       [3]byte
+	Creacion    [25]byte
+	Nombre      [20]byte
+	IndicesSubs [6]int64
+	IndiceDD    int64
+	IndiceNext  int64
+	Prop        Propietario
+	Permisos    [3]byte
 }
 
 type DetalleDir struct {
