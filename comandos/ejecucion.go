@@ -156,6 +156,11 @@ func leerComando(raiz analizador.Nodo) {
 		sistema.EliminarUsuario(rmusr)
 	case "CHMOD":
 	case "MKFILE":
+		mkfile := sistema.Mkfile{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarMkfile(raiz.Hijos[i], &mkfile)
+		}
+		sistema.AdminMkFile(mkfile)
 	case "CAT":
 	case "RM":
 	case "EDIT":
@@ -174,7 +179,6 @@ func leerComando(raiz analizador.Nodo) {
 	case "LOSS":
 	case "RECOVERY":
 	case "REP":
-		fmt.Println("entr con rep")
 		reporte := reportes.Reporte{}
 		for i := 0; i < len(raiz.Hijos); i++ {
 			validarRep(raiz.Hijos[i], &reporte)
@@ -286,7 +290,7 @@ func validarRep(raiz analizador.Nodo, comando *reportes.Reporte) {
 	case "id":
 		comando.Id = raiz.Hijos[0].Dato
 	case "ruta":
-		comando.Ruta = analizador.HomePath(raiz.Hijos[0])
+		comando.Ruta = raiz.Hijos[0].Dato
 	}
 }
 
@@ -371,5 +375,25 @@ func validarchmod(raiz analizador.Nodo, chmod *sistema.Chmod) {
 		chmod.R = true
 	case "ugo":
 		chmod.Ugo = raiz.Hijos[0].Dato
+	}
+}
+
+func validarMkfile(raiz analizador.Nodo, mkfile *sistema.Mkfile) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		mkfile.Id = raiz.Hijos[0].Dato
+	case "path":
+		mkfile.Path = raiz.Hijos[0].Dato
+	case "p":
+		mkfile.P = true
+	case "size":
+		s, err := strconv.Atoi(raiz.Hijos[0].Dato)
+		if err != nil {
+			mkfile.Size = 0
+			return
+		}
+		mkfile.Size = int64(s)
+	case "cont":
+		mkfile.Cont = raiz.Hijos[0].Dato
 	}
 }

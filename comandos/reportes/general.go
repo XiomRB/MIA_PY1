@@ -24,13 +24,18 @@ func AdministrarReportes(comando Reporte) {
 	case "sb":
 		fmt.Println(Reportar(comando, RepSB(comando)))
 	case "directorio":
-		fmt.Println("estoy aqui")
 		fmt.Println(Reportar(comando, RepDirectory(comando)))
+	case "tree_file":
+		if len(comando.Ruta) == 0 {
+			fmt.Println("Error: no coloco la ruta del archivo")
+		} else {
+			fmt.Println(Reportar(comando, RepTreeFile(comando)))
+		}
 	}
 }
 
 func Reportar(comando Reporte, rep string) string {
-	if len(rep) == 35 {
+	if len(rep) <= 35 {
 		return rep
 	}
 	dotFile := "reporte.dot"

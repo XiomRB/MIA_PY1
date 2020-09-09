@@ -89,7 +89,7 @@ func AdminCarpetas(comando Mkdir) {
 		if LoginUs.Estado {
 			letra, indice := EncontrarMontada(comando.Id)
 			if letra != -1 {
-				decision := BuscarCarpeta(comando.Path, &disco.DiscosMontados[letra].Particiones[indice], comando.Padre)
+				decision := BuscarCarpeta(comando.Path, &disco.DiscosMontados[letra].Particiones[indice], comando.Padre, false)
 				if decision == -2 {
 					fmt.Println("Error: Hay carpetas padre que no existe")
 				}
@@ -102,7 +102,7 @@ func AdminCarpetas(comando Mkdir) {
 	}
 }
 
-func BuscarCarpeta(path string, particion *disco.Montada, crear bool) int {
+func BuscarCarpeta(path string, particion *disco.Montada, crear bool, mkfile bool) int {
 	p := ElimComillas(path)
 	lista := DescomponerRuta(p)
 	i := 0
@@ -122,7 +122,14 @@ func BuscarCarpeta(path string, particion *disco.Montada, crear bool) int {
 			}
 		}
 	} else if i == len(lista)-1 {
-		padre = CrearCarpeta(particion, lista[len(lista)-1], indice)
+		if !mkfile {
+			padre = CrearCarpeta(particion, lista[len(lista)-1], indice)
+		} else {
+			padre, indice = EncontrarCarpeta(particion, lista[i], indice)
+			if padre == 0 && lista[len(lista)-1] != "/" {
+				padre = CrearCarpeta(particion, lista[len(lista)-1], indice)
+			}
+		}
 	} else {
 		return -2
 	}
