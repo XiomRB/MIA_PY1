@@ -95,16 +95,20 @@ func graphEBR(path string, ext estructuras.Particion) string {
 
 func extraerNombre(nombre [16]byte) string {
 	n := ""
-	for i := 0; nombre[i] != 0; i++ {
-		n += string(nombre[i])
+	for i := 0; i < 16; i++ {
+		if nombre[i] != 0 {
+			n += string(nombre[i])
+		}
 	}
 	return n
 }
 
 func extraerStr(nombre [20]byte) string {
 	n := ""
-	for i := 0; nombre[i] != 0; i++ {
-		n += string(nombre[i])
+	for i := 0; i < 20; i++ {
+		if nombre[i] != 0 {
+			n += string(nombre[i])
+		}
 	}
 	return n
 }

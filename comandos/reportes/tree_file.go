@@ -14,7 +14,7 @@ func RepTreeFile(comando Reporte) string {
 	}
 	carpeta, dd, file, inodos := sistema.BuscarArchivo(&disco.DiscosMontados[letra].Particiones[indice], comando.Ruta)
 	if carpeta == -1 {
-		return "Error: no existe la ruta"
+		return "Error: no existe el archivo"
 	}
 	dot := "digraph g{\n"
 	dot += GraphFile(comando.Ruta, inodos, dd, file, &disco.DiscosMontados[letra].Particiones[indice])
@@ -24,31 +24,31 @@ func RepTreeFile(comando Reporte) string {
 
 func GraphFile(path string, inodos []int, dd, file int, part *disco.Montada) string {
 	dot, nodo, arch := GraphCarpeta(path)
-	dot += "detalle" + strconv.Itoa(dd) + " [shape = textplain label <<table color='blue' cellspacing='0'><tr><td colspan ='2'>Detalle Directorio</td></tr><tr><td>" + arch + "</td><td>Inodo "
+	dot += "detalle" + strconv.Itoa(dd) + " [shape = record label= \"{Detalle Directorio|"
 	if len(inodos) == 0 {
-		dot += "-1</td></tr></table>>];\n"
+		dot += arch + "}\"];\n"
 		return dot
 	}
-	dot += strconv.Itoa(inodos[0]) + "</td></tr></table>>];\n"
-	dot += nodo + " -> inodo" + strconv.Itoa(inodos[0]) + ";\n"
-	subinodo := ""
+	dot += "<inodo" + strconv.Itoa(inodos[0]) + ">" + arch + "}\"];\n"
+	dot += nodo + " -> " + "detalle" + strconv.Itoa(dd) + ";\n"
+	dot += "detalle" + strconv.Itoa(dd) + " -> inodo" + strconv.Itoa(inodos[0]) + ":ind" + strconv.Itoa(inodos[0]) + ";\n"
 	nombre := ""
+
 	for i := 0; i < len(inodos); i++ {
-		nombre = "inodo" + strconv.Itoa(inodos[i])
-		subinodo = "subgraph " + nombre + "{\nnode [shape = box];\n"
+		dot += "inodo" + strconv.Itoa(inodos[i]) + " [shape = record label = \"{<ind" + strconv.Itoa(inodos[i]) + ">Inodo " + strconv.Itoa(inodos[i])
 		for j := 0; j < 4; j++ {
-			if part.Inodos[i].Bloques[j] != -1 {
-				subinodo += nombre + "bb" + strconv.Itoa(j) + " [label = \"Bloque " + strconv.Itoa(int(part.Inodos[i].Bloques[j])) + "\"];\n"
-				dot += "bb" + strconv.Itoa(int(part.Inodos[i].Bloques[j])) + " [label = \"" + retornarBloque(part.BB[j].Text) + "\"];\n"
-				dot += nombre + "bb" + strconv.Itoa(j) + " -> " + "bb" + strconv.Itoa(int(part.Inodos[i].Bloques[j])) + ";\n"
+			if part.Inodos[inodos[i]].Bloques[j] != -1 {
+				dot += " | <inbb" + strconv.Itoa(int(part.Inodos[inodos[i]].Bloques[j])) + ">Bloque " + strconv.Itoa(int(part.Inodos[inodos[i]].Bloques[j]))
+				nombre += "bb" + strconv.Itoa(int(part.Inodos[inodos[i]].Bloques[j])) + " [ shape = box label = \"" + retornarBloque(part.BB[part.Inodos[inodos[i]].Bloques[j]].Text) + "\"];\n"
+				nombre += "inodo" + strconv.Itoa(inodos[i]) + ":inbb" + strconv.Itoa(int(part.Inodos[inodos[i]].Bloques[j])) + " -> " + "bb" + strconv.Itoa(int(part.Inodos[inodos[i]].Bloques[j])) + ";\n"
 			}
 		}
 		if i < len(inodos)-1 {
-			subinodo += nombre + "indirecto" + " [label=\"Inodo " + strconv.Itoa(inodos[i+1]) + "\"];\n"
-			dot += nombre + "indirecto -> inodo" + strconv.Itoa(inodos[i+1]) + ";\n"
+			dot += " | <indirecto" + strconv.Itoa(inodos[i+1]) + ">Indirecto " + strconv.Itoa(inodos[i+1])
+			nombre += "inodo" + strconv.Itoa(inodos[i]) + ":indirecto" + strconv.Itoa(inodos[i+1]) + " -> inodo" + strconv.Itoa(inodos[i+1]) + ":ind" + strconv.Itoa(inodos[i+1]) + ";\n"
 		}
-		subinodo += "}\n"
-		dot += subinodo
+		dot += "}\"];\n"
+		dot += nombre
 	}
 	return dot
 }
@@ -64,13 +64,15 @@ func GraphCarpeta(path string) (string, string, string) { //retorna el dot, y el
 			dot += "carpeta" + strconv.Itoa(i) + " -> carpeta" + strconv.Itoa(i+1) + ";\n"
 		}
 	}
-	return dot, "carpeta" + strconv.Itoa(len(ruta)-1), ruta[len(ruta)-1]
+	return dot, "carpeta" + strconv.Itoa(len(ruta)-2), ruta[len(ruta)-1]
 }
 
 func retornarBloque(b [25]byte) string {
 	bb := ""
-	for i := 0; b[i] != 0; i++ {
-		bb += string(b[i])
+	for i := 0; i < 25; i++ {
+		if b[i] != 0 {
+			bb += string(b[i])
+		}
 	}
 	return bb
 }

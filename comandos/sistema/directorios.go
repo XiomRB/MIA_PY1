@@ -110,7 +110,7 @@ func BuscarCarpeta(path string, particion *disco.Montada, crear bool, mkfile boo
 	padre := 0
 	for i = 1; i < len(lista)-1; i++ {
 		indice, padre = EncontrarCarpeta(particion, lista[i], indice)
-		if indice == 0 { //si no se encontro la carpeta se sale del for
+		if indice == -1 { //si no se encontro la carpeta se sale del for
 			break
 		}
 	}
@@ -126,7 +126,7 @@ func BuscarCarpeta(path string, particion *disco.Montada, crear bool, mkfile boo
 			padre = CrearCarpeta(particion, lista[len(lista)-1], indice)
 		} else {
 			padre, indice = EncontrarCarpeta(particion, lista[i], indice)
-			if padre == 0 && lista[len(lista)-1] != "/" {
+			if padre == -1 {
 				padre = CrearCarpeta(particion, lista[len(lista)-1], indice)
 			}
 		}
@@ -156,12 +156,12 @@ func ElimComillas(p string) string {
 func EncontrarSubVacio(padre int, part *disco.Montada) (int, int) {
 	i := 0
 	for i = 0; i < 6; i++ {
-		if part.AVD[padre].IndicesSubs[i] == 0 {
+		if part.AVD[padre].IndicesSubs[i] == -1 {
 			return i, padre
 		}
 	}
 	if i == 6 {
-		if part.AVD[padre].IndiceNext > 0 {
+		if part.AVD[padre].IndiceNext > -1 {
 			i, padre = EncontrarSubVacio(int(part.AVD[padre].IndiceNext), part)
 		} else {
 			avd := CrearAVD(string(part.AVD[padre].Nombre[:]))
@@ -181,7 +181,7 @@ func EncontrarSubVacio(padre int, part *disco.Montada) (int, int) {
 			}
 			if j == len(part.BitmapAVD) {
 				fmt.Println("Error: ya ha creado la cantidad maxima de directorios")
-				return 0, -1
+				return -1, -1
 			}
 			part.AVD[padre].IndiceNext = int64(j) //le asigno el indice del anexo al next del padre
 			i = 0
@@ -198,12 +198,14 @@ func EncontrarCarpeta(particion *disco.Montada, nombre string, indice int) (int,
 	padre := indice
 	for i := 0; i < 6; i++ {
 		index = int(particion.AVD[indice].IndicesSubs[i])
-		if particion.AVD[index].Nombre == name {
-			return index, padre
+		if index != -1 {
+			if particion.AVD[index].Nombre == name {
+				return index, padre
+			}
 		}
 	}
 	index = int(particion.AVD[indice].IndiceNext)
-	if index != 0 {
+	if index != -1 {
 		index, padre = EncontrarCarpeta(particion, nombre, index)
 	}
 	return index, padre

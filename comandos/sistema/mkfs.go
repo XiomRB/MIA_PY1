@@ -137,6 +137,9 @@ func CrearInodo(indice int64, size int64) estructuras.Inodo {
 	inodo.Indice = indice
 	inodo.Size = size
 	inodo.Indirecto = -1
+	for i := 0; i < 4; i++ {
+		inodo.Bloques[i] = -1
+	}
 	if inodo.Size%25 == 0 {
 		inodo.NBloques = inodo.Size / 25
 	} else {
@@ -212,6 +215,10 @@ func DarHora() string {
 
 func CrearAVD(name string) estructuras.AVD {
 	avd := estructuras.AVD{}
+	for i := 0; i < 6; i++ {
+		avd.IndicesSubs[i] = -1
+	}
+	avd.IndiceNext = -1
 	copy(avd.Creacion[:], DarHora())
 	copy(avd.Nombre[:], name)
 	avd.Prop.Name = LoginUs.Name

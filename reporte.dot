@@ -1,14 +1,15 @@
 digraph g{
-node [shape = box];
-0 [label = "/"]
-0 -> 1
-1 [label = "home"]
-1 -> 2
-2 [label = "user"]
-2 -> 3
-3 [label = "docs"]
-3 -> 4
-3 -> 5
-4 [label = "usac"]
-5 [label = "inge"]
+carpeta0 [shape = box label = "/"];
+carpeta0 -> carpeta1;
+carpeta1 [shape = box label = "home"];
+carpeta1 -> carpeta2;
+carpeta2 [shape = box label = "user"];
+carpeta2 -> carpeta3;
+carpeta3 [shape = box label = "docs"];
+detalle1 [shape = record label= "{Detalle Directorio|<inodo1>a.txt}"];
+carpeta3 -> detalle1;
+detalle1 -> inodo1:ind1;
+inodo1 [shape = record label = "{<ind1>Inodo 1 | <inbb2>Bloque 2}"];
+bb2 [ shape = box label = "abcdefghijklmno"];
+inodo1:inbb2 -> bb2;
 }

@@ -216,6 +216,7 @@ func CrearNInodo(part *disco.Montada, size int64) int {
 func BuscarArchivo(part *disco.Montada, ruta string) (int, int, int, []int) { //retorna carpeta, detalle, file y inodos de file
 	carpeta := SearchCarpeta(part, ruta)
 	var inodos []int
+	ruta = ElimComillas(ruta)
 	r := strings.Split(ruta, "/")
 	var path [20]byte
 	copy(path[:], r[len(r)-1])

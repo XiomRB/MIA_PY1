@@ -6,10 +6,14 @@ import (
 )
 
 func main() {
-
-	Path := "exec -path->/home/gabriela/Documentos/entrada2.mia"
+	//Path := "exec -path->/home/gabriela/Documentos/entrada2.mia"
 
 	fmt.Println("Introduzca un comando:")
-
-	comandos.Ejecutar(Path)
+	var cmd string
+	fmt.Scanln(&cmd)
+	for len(cmd) > 4 {
+		comandos.Ejecutar(cmd)
+		fmt.Println("\nIntroduzca un comando:")
+		fmt.Scanln(&cmd)
+	}
 }
