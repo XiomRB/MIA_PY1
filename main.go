@@ -2,18 +2,26 @@ package main
 
 import (
 	"Archivos/PY1/comandos"
+	"bufio"
 	"fmt"
+	"os"
 )
 
 func main() {
-	//Path := "exec -path->/home/gabriela/Documentos/entrada2.mia"
+	/*Path := "exec -path->/home/gabriela/Documentos/entrada.mia"
 
+	comandos.Ejecutar(Path)*/
 	fmt.Println("Introduzca un comando:")
-	var cmd string
-	fmt.Scanln(&cmd)
-	for len(cmd) > 4 {
-		comandos.Ejecutar(cmd)
+	reader := bufio.NewReader(os.Stdin)
+	entrada, _ := reader.ReadString('\n')
+	var path string
+	path = string(entrada)
+	fmt.Println(len(path))
+	for len(path) > 5 {
+		fmt.Println(len(path))
+		comandos.Ejecutar(path)
 		fmt.Println("\nIntroduzca un comando:")
-		fmt.Scanln(&cmd)
+		entrada, _ := reader.ReadString('\n')
+		path = string(entrada)
 	}
 }

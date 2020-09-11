@@ -190,7 +190,9 @@ func leerComando(raiz analizador.Nodo) {
 	case "EXEC":
 		p := raiz.Hijos[0]
 		if strings.EqualFold(p.Dato, "path") {
+			fmt.Println(p)
 			path := analizador.HomePath(p.Hijos[0])
+			fmt.Println(path)
 			if strings.HasSuffix(path, ".mia") {
 				archivo := ejecutarArchivo(path)
 				if len(archivo) > 0 {

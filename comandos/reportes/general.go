@@ -33,6 +33,10 @@ func AdministrarReportes(comando Reporte) {
 		}
 	case "bm_arbdir", "bm_block", "bm_detdir", "bm_inode":
 		selBitmap(comando)
+	case "tree_directorio":
+		fmt.Println(Reportar(comando, RepTreeDirectory(comando)))
+	case "tree_complete":
+		fmt.Println(Reportar(comando, repTree(comando)))
 	}
 }
 

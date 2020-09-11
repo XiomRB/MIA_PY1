@@ -2,11 +2,19 @@ package reportes
 
 import (
 	"Archivos/PY1/comandos/disco"
+	"Archivos/PY1/comandos/sistema"
 	"strconv"
 )
 
-func repTree(comando Reporte) {
-
+func repTree(comando Reporte) string {
+	letra, indice := sistema.EncontrarMontada(comando.Id)
+	if letra == -1 {
+		return "Error: la particion no esta montada"
+	}
+	dot := "digraph g{\n"
+	dot += graphDirectorio(&disco.DiscosMontados[letra].Particiones[indice])
+	dot += "}"
+	return dot
 }
 
 func graphDirectorio(part *disco.Montada) string {
