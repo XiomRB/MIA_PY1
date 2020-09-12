@@ -39,9 +39,10 @@ func Scanner(cadena string) []Token {
 			} else if cadena[i] == 47 { // /
 				estado = 6
 				tok += string(cadena[i])
-			} else if cadena[i] == 35 {
-				tok += string(cadena[i])
-				estado = 3
+			} else if cadena[i] == 92 { // \
+				estado = 7
+			} else if cadena[i] == 35 { //#
+				estado = 8
 			} else if cadena[i] == 10 {
 				l++
 				j = 0
@@ -141,12 +142,22 @@ func Scanner(cadena string) []Token {
 				tok += string(cadena[i])
 			}
 		case 6:
+			if (cadena[i] == 95) || (cadena[i] > 64 && cadena[i] < 91) || (cadena[i] > 96 && cadena[i] < 123) || (cadena[i] > 47 && cadena[i] < 58) {
+				tok += string(cadena[i])
+				estado = 4
+			} else {
+				imprimirError(tok, l, j)
+			}
+		case 7:
 			if cadena[i] == 42 { // *
 				estado = 0
 				tok = ""
-			} else if (cadena[i] == 95) || (cadena[i] > 64 && cadena[i] < 91) || (cadena[i] > 96 && cadena[i] < 123) || (cadena[i] > 47 && cadena[i] < 58) {
-				tok += string(cadena[i])
-				estado = 4
+			} else {
+				imprimirError("\\", l, j)
+			}
+		case 8:
+			if cadena[i] == 10 {
+				estado = 0
 			}
 		}
 		j++

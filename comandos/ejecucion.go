@@ -185,14 +185,13 @@ func leerComando(raiz analizador.Nodo) {
 		}
 		reportes.AdministrarReportes(reporte)
 	case "PAUSE":
+		var pausa string
 		fmt.Println("El programa esta en pausa, presione cualquier letra para continuar")
-		fmt.Scan()
+		fmt.Scanln(&pausa)
 	case "EXEC":
 		p := raiz.Hijos[0]
 		if strings.EqualFold(p.Dato, "path") {
-			fmt.Println(p)
 			path := analizador.HomePath(p.Hijos[0])
-			fmt.Println(path)
 			if strings.HasSuffix(path, ".mia") {
 				archivo := ejecutarArchivo(path)
 				if len(archivo) > 0 {

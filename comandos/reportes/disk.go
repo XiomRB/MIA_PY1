@@ -30,17 +30,26 @@ func crearGraphExt(ext estructuras.Particion, path string, size int64) string {
 	aux := ebr
 	for ebr.Next != -1 {
 		aux = ebr
+		n = ""
+		for j := 0; j < 16; j++ {
+			if ebr.Name[j] != 0 {
+				n += string(aux.Name[j])
+			}
+		}
+		p += graphPart(ebr.Size*600/size, n)
 		ebr = disco.LeerEBR(path, aux.Next)
 		libre := ebr.Start - aux.Start - aux.Size
 		if libre > 0 {
 			p += graphPart(libre*600/size, "Libre")
 		}
-		n = ""
-		for j := 0; ebr.Name[j] != 0; j++ {
+	}
+	n = ""
+	for j := 0; j < 16; j++ {
+		if ebr.Name[j] != 0 {
 			n += string(ebr.Name[j])
 		}
-		graphPart(ebr.Size*600/size, n)
 	}
+	p += graphPart(ebr.Size*600/size, n)
 	libre = ext.Size - ebr.Size - ebr.Start
 	if libre > 0 {
 		p += graphPart(libre*600/size, "Libre")

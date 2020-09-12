@@ -44,10 +44,7 @@ func Administrar(comando Fdisk) {
 			if op == "1" {
 				borrada := borrarPart(comando, &mbr)
 				if borrada.Status != GetChar("0") {
-					//var u Unmount													-----------------------------retomar despues
-					//u.Desmontadas = append(u.Desmontadas, comando.Name)			-----------------------------retomar despues
 					if borrada.Tipo == GetChar("p") || borrada.Tipo == GetChar("e") {
-						//Desmontar(u)												-----------------------------retomar despues
 						if strings.EqualFold(comando.Delete, "full") {
 							f, err := os.OpenFile(comando.Path, os.O_RDWR, 0755) //leer o escribir
 							if err != nil {
@@ -64,10 +61,7 @@ func Administrar(comando Fdisk) {
 							f.Close()
 						}
 						fmt.Println("Particion borrada con exito")
-					} /*else if borrada.Tipo == GetChar("l") {
-						//Desmontar(u)											-----------------------------retomar despues
-						fmt.Println("Particion borrada con exito")
-					}*/
+					}
 				} else {
 					fmt.Println("Error: La particion no existe")
 				}
@@ -103,6 +97,7 @@ func crearParticion(comando Fdisk, mbr *estructuras.MBR) {
 					fmt.Println("Error: No existe particion extendida donde pueda agregar una logica")
 					return
 				}
+				fmt.Println("Particion creada exitosamente")
 			} else if full { // 4 particiones llenas
 				if strings.EqualFold(comando.Tipo, "l") {
 					extendida := GetExtendida(mbr)
@@ -276,47 +271,48 @@ func borrarPart(c Fdisk, mbr *estructuras.MBR) estructuras.Particion {
 			}
 			return part
 		}
-		if mbr.Particiones[i].Tipo == GetChar("e") {
-			aux = mbr.Particiones[i]
-		}
 	}
-	if aux.Tipo == GetChar("e") {
-		aux.Tipo = GetChar("l")
-		var ebr estructuras.EBR
-		var ebraux estructuras.EBR
-		ebr = LeerEBR(c.Path, aux.Start)
-		ebraux = ebr
-		if name == ebr.Name {
-			ebr.Size = 0
-			ebr.Status = 0
-			copy(ebr.Name[:], "0")
-			escribirEBR(c, &ebr)
-			aux.Name = ebraux.Name
-			return aux
-		}
-		for ebr.Next != -1 && ebr.Name != name {
-			ebraux = ebr
-			ebr = LeerEBR(c.Path, ebr.Next)
-		}
-		if name == ebr.Name {
-			ebraux.Next = ebr.Next
-			var escrito estructuras.EBR
-			escrito.Next = 0
-			f, err := os.OpenFile(c.Path, os.O_RDWR, 0755) //leer o escribir
-			if err != nil {
-				log.Fatal(err)
+	/*	if mbr.Particiones[i].Tipo == GetChar("e") {
+				aux = mbr.Particiones[i]
 			}
-			f.Seek(int64(ebr.Start), 0)
-			var ebrb bytes.Buffer
-			binary.Write(&ebrb, binary.BigEndian, &escrito)
-			EscribirBytes(f, ebrb.Bytes())
-			f.Close()
-			aux.Name = ebr.Name
-			return aux
 		}
-		aux.Status = GetChar("0")
-		return aux
-	}
+		if aux.Tipo == GetChar("e") {
+			aux.Tipo = GetChar("l")
+			var ebr estructuras.EBR
+			var ebraux estructuras.EBR
+			ebr = LeerEBR(c.Path, aux.Start)
+			ebraux = ebr
+			if name == ebr.Name {
+				ebr.Size = 0
+				ebr.Status = 0
+				copy(ebr.Name[:], "0")
+				escribirEBR(c, &ebr)
+				aux.Name = ebraux.Name
+				return aux
+			}
+			for ebr.Next != -1 && ebr.Name != name {
+				ebraux = ebr
+				ebr = LeerEBR(c.Path, ebr.Next)
+			}
+			if name == ebr.Name {
+				ebraux.Next = ebr.Next
+				var escrito estructuras.EBR
+				escrito.Next = 0
+				f, err := os.OpenFile(c.Path, os.O_RDWR, 0755) //leer o escribir
+				if err != nil {
+					log.Fatal(err)
+				}
+				f.Seek(int64(ebr.Start), 0)
+				var ebrb bytes.Buffer
+				binary.Write(&ebrb, binary.BigEndian, &escrito)
+				EscribirBytes(f, ebrb.Bytes())
+				f.Close()
+				aux.Name = ebr.Name
+				return aux
+			}
+			aux.Status = GetChar("0")
+			return aux
+		}*/
 	return aux
 }
 
@@ -367,6 +363,7 @@ func adminEBR(extendida estructuras.Particion, comando Fdisk) {
 			ebr.Next = -1
 			copy(ebr.Name[:], comando.Name)
 			escribirEBR(comando, &ebr)
+			fmt.Println("Particion logica creada")
 		} else {
 			agregarEBR(extendida, comando, ebr)
 		}

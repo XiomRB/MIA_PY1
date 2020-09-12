@@ -1,15 +1,65 @@
 digraph g{
-carpeta0 [shape = box label = "/"];
-carpeta0 -> carpeta1;
-carpeta1 [shape = box label = "home"];
-carpeta1 -> carpeta2;
-carpeta2 [shape = box label = "user"];
-carpeta2 -> carpeta3;
-carpeta3 [shape = box label = "docs"];
-detalle1 [shape = record label= "{Detalle Directorio|<inodo1>a.txt}"];
-carpeta3 -> detalle1;
-detalle1 -> inodo1:ind1;
-inodo1 [shape = record label = "{<ind1>Inodo 1 | <inbb2>Bloque 2}"];
-bb2 [ shape = box label = "abcdefghijklmno"];
-inodo1:inbb2 -> bb2;
-}
+			tbl[
+				shape = plaintext
+				label = <
+				<table border='1' cellborder='0' color='blue' cellspacing='1'>
+        			<tr><td width = '0' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>MBR</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '11' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Particion1</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '117' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+		 		<tr><td>Particion2</td></tr>
+				 <tr><td width = '5' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>lofica1</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '5' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>logica2</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '5' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>logica3</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '87' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Libre</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td></tr>
+			</table>
+		</td><td width = '117' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Particion3</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '117' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Particion4</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td><td width = '236' border = '0'>
+			<table border='1' cellborder='0' color='blue' cellspacing='1'>
+				<tr><td>  </td></tr>
+		 		<tr><td>Libre</td></tr>
+		 		<tr><td>  </td></tr>
+			</table>
+		</td></tr></table>>];}
