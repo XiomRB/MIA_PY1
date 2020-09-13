@@ -32,15 +32,15 @@ func reportaBitmap(path string, bitmap []byte) {
 	f := obtenerCarpeta(path)
 	salto := 1
 	for i := 0; i < len(bitmap); i++ {
-		if salto%10 == 0 {
-			rep = append(rep, 10)
-		}
 		if bitmap[i] == 0 {
 			rep = append(rep, 48)
 			rep = append(rep, 44)
 		} else {
 			rep = append(rep, 49)
 			rep = append(rep, 44)
+		}
+		if salto%10 == 0 {
+			rep = append(rep, 10)
 		}
 		salto++
 	}

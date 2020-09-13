@@ -24,7 +24,7 @@ func CrearCarpeta(particion *disco.Montada, nombre string, padre int) int { //el
 		if nvd == -1 {
 			return -1
 		}
-		particion.AVD[padre].IndicesSubs[index] = int64(nvd)
+		particion.AVD[apa].IndicesSubs[index] = int64(nvd)
 		return nvd
 	} else if LoginUs.Grupo == particion.AVD[padre].Prop.Grupo {
 		if strings.Contains(VerificarPermisos(particion.AVD[padre].Permisos[1]), "w") {
@@ -36,7 +36,7 @@ func CrearCarpeta(particion *disco.Montada, nombre string, padre int) int { //el
 			if nvd == -1 {
 				return -1
 			}
-			particion.AVD[padre].IndicesSubs[index] = int64(nvd)
+			particion.AVD[apa].IndicesSubs[index] = int64(nvd)
 			return nvd
 		} else {
 			fmt.Println("Error: no tiene los permisos, para crear carpetas, en la ruta especificada")
@@ -51,7 +51,7 @@ func CrearCarpeta(particion *disco.Montada, nombre string, padre int) int { //el
 		if nvd == -1 {
 			return -1
 		}
-		particion.AVD[padre].IndicesSubs[index] = int64(nvd)
+		particion.AVD[apa].IndicesSubs[index] = int64(nvd)
 		return nvd
 	} else {
 		fmt.Println("Error: no tiene los permisos, para crear carpetas, en la ruta especificada")
