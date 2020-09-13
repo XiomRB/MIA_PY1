@@ -102,8 +102,12 @@ func Scanner(cadena string) []Token {
 					tokens = append(tokens, crearToken(tok+".mia", l, j, 4))
 					i += 4
 					j += 4
-				} else if strings.Compare("png", string([]byte{cadena[i+1], cadena[i+2], cadena[i+3]})) == 0 || strings.Compare("jpg", string([]byte{cadena[i+1], cadena[i+2], cadena[i+3]})) == 0 {
+				} else if strings.Compare("png", string([]byte{cadena[i+1], cadena[i+2], cadena[i+3]})) == 0 || strings.Compare("jpg", string([]byte{cadena[i+1], cadena[i+2], cadena[i+3]})) == 0 || strings.Compare("pdf", string([]byte{cadena[i+1], cadena[i+2], cadena[i+3]})) == 0 {
 					tokens = append(tokens, crearToken(tok+".png", l, j, 4))
+					i += 4
+					j += 4
+				} else if strings.Compare("txt", string([]byte{cadena[i+1], cadena[i+2], cadena[i+3]})) == 0 {
+					tokens = append(tokens, crearToken(tok+".txt", l, j, 4))
 					i += 4
 					j += 4
 				} else {

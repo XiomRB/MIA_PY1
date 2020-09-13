@@ -98,13 +98,13 @@ func CrearArchivo(comando Mkfile, part *disco.Montada, crear bool) {
 				}
 			}
 			for i := 0; i < nb-1; i++ {
-				part.Inodos[i].Indirecto = part.Inodos[i+1].Indice
+				part.Inodos[ids[i]].Indirecto = part.Inodos[ids[i+1]].Indice
 			}
 			longitud := int(comando.Size) - len(comando.Cont)
 			abc := "abcdefghijklmnopqrstuvwxyz"
 			l := 0
 			for i := len(comando.Cont); i < longitud; i++ { //se crea la cadena a escribir en el archivo
-				if l == len(abc)-1 {
+				if l == len(abc) {
 					l = 0
 				}
 				comando.Cont += string(abc[l])

@@ -45,7 +45,12 @@ func leerComando(raiz analizador.Nodo) {
 	case "RMDISK":
 		n := raiz.Hijos[0]
 		if strings.EqualFold(n.Dato, "path") {
-			disco.EliminarDisco(analizador.HomePath(n.Hijos[0]), raiz.Linea)
+			fmt.Println("Esta seguro que desea eliminar el disco ?\n  1.Si       2.No")
+			elim := ""
+			fmt.Scanln(&elim)
+			if elim == "1" {
+				disco.EliminarDisco(analizador.HomePath(n.Hijos[0]), raiz.Linea)
+			}
 		} else {
 			fmt.Println("Error: El parametro path es obligatorio  --Linea: ", raiz.Linea)
 		}
@@ -201,6 +206,8 @@ func leerComando(raiz analizador.Nodo) {
 				fmt.Println("Error: El archivo que desea abrir no es de extension mia")
 			}
 		}
+	default:
+		fmt.Println("Error: comando no reconocido")
 	}
 }
 

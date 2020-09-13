@@ -120,6 +120,8 @@ func Montar(comando Mount) {
 				DiscosMontados = append(DiscosMontados, disco)
 				fmt.Println("Particion montada exitosamente")
 			}
+		} else {
+			fmt.Println("Error: no existe la particion")
 		}
 	}
 }

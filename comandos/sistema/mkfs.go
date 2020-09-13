@@ -61,9 +61,6 @@ func AdminComando(comando Mkfs) {
 						f.Close()
 					}
 					creacionSistema(&disco.DiscosMontados[letra].Particiones[indice])
-					fmt.Println(len(disco.DiscosMontados[letra].Particiones[indice].AVD))
-					//disco.EscribirSB(path, disco.DiscosMontados[letra].Particiones[indice].Start, disco.DiscosMontados[letra].Particiones[indice].Superboot)
-					//disco.EscribirSB(path, disco.DiscosMontados[letra].Particiones[indice].Start+int64(unsafe.Sizeof(disco.DiscosMontados[letra].Particiones[indice].Superboot)), disco.DiscosMontados[letra].Particiones[indice].Superboot)
 					fmt.Println("Sistema de archivos creado")
 				} else {
 					fmt.Println("Error: la particion no ha sido montada")
@@ -91,11 +88,11 @@ func creacionSistema(particion *disco.Montada) {
 	copy(particion.Grupos[0].Name[:], "root")
 	particion.Grupos[0].Estado = true
 	particion.Grupos[0].Usuarios = append(particion.Grupos[0].Usuarios, usuario)
-	bitmaparbol := make([]byte, particion.Superboot.NoArbolVirtual)
+	bitmaparbol := make([]byte, 150)
 	bitmaparbol[0] = 1
-	bitmapdetalle := make([]byte, particion.Superboot.NoDetalleDirectorio)
+	bitmapdetalle := make([]byte, 150)
 	bitmapdetalle[0] = 1
-	bitmapinodo := make([]byte, particion.Superboot.NoInodos)
+	bitmapinodo := make([]byte, 300)
 	bitmapinodo[0] = 1
 	file := CrearFile("users.txt", 0)
 	detalle := estructuras.DetalleDir{}
@@ -105,16 +102,16 @@ func creacionSistema(particion *disco.Montada) {
 	avd.Prop.Grupo = usuario.Name
 	avd.IndiceDD = 0
 	detalle.Files[0] = file
-	inodo := CrearInodo(1, int64(len(users)))
-	particion.Inodos = append(particion.Inodos, inodo)
+	inodo := CrearInodo(0, int64(len(users)))
 	particion.DD = append(particion.DD, detalle)
 	particion.AVD = append(particion.AVD, avd)
 	bloques := EscribirBloques(users, inodo.NBloques)
 	for i := 0; i < len(bloques); i++ {
-		inodo.Bloques[i] = particion.Superboot.InicioBloque + int64(i*int(unsafe.Sizeof(bloques[i])))
+		inodo.Bloques[i] = int64(i)
 		particion.BB = append(particion.BB, bloques[i])
 	}
-	bitmapbloque := make([]byte, particion.Superboot.NoBloques)
+	bitmapbloque := make([]byte, 500)
+	particion.Inodos = append(particion.Inodos, inodo)
 	bitmapbloque[0] = 1
 	bitmapbloque[1] = 1
 	particion.BitmapInodo = bitmapinodo
@@ -175,7 +172,7 @@ func crearSuperB(size, inicio int64, name [16]byte) estructuras.SBoot {
 	superboot.NoArbolVirtual = no
 	superboot.NoInodos = 5 * no
 	superboot.SizeArbol = av
-	superboot.NoBloques = b
+	superboot.NoBloques = 20 * no
 	superboot.SizeDetalleDirec = dd
 	superboot.SizeInodo = i
 	superboot.SizeBloque = b

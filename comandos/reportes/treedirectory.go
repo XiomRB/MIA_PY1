@@ -22,18 +22,19 @@ func RepTreeDirectory(comando Reporte) string {
 		}
 	}
 	fmt.Scanln(&op)
-	if op < len(disco.DiscosMontados[letra].Particiones[indice].AVD) {
-		nombre = string(disco.DiscosMontados[letra].Particiones[indice].AVD[op].Nombre[:])
+	if op <= len(disco.DiscosMontados[letra].Particiones[indice].AVD) {
+		nombre = extraerStr(disco.DiscosMontados[letra].Particiones[indice].AVD[op-1].Nombre)
 		if len(nombre) == 0 {
 			return "Error: el directorio no existe"
 		}
-		if disco.DiscosMontados[letra].Particiones[indice].AVD[op].IndiceDD == -1 {
+		if disco.DiscosMontados[letra].Particiones[indice].AVD[op-1].IndiceDD == -1 {
 			return "La carpeta no contiene archivos"
 		}
 		dot := "digraph g{\n"
-		dot += nombre + "[shape = box];\n" + nombre + " -> detalle" + strconv.Itoa(int(disco.DiscosMontados[letra].Particiones[indice].AVD[op].IndiceDD))
-		dot += graphDetalle(&disco.DiscosMontados[letra].Particiones[indice], int(disco.DiscosMontados[letra].Particiones[indice].AVD[op].IndiceDD))
+		dot += nombre + "[shape = box];\n" + nombre + " -> detalle" + strconv.Itoa(int(disco.DiscosMontados[letra].Particiones[indice].AVD[op-1].IndiceDD)) + ";\n"
+		dot += graphDetalle(&disco.DiscosMontados[letra].Particiones[indice], int(disco.DiscosMontados[letra].Particiones[indice].AVD[op-1].IndiceDD), false)
 		dot += "}"
+		return dot
 	}
 	return "Error: la opcion es incorrecta"
 }

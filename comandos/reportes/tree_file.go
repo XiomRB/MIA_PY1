@@ -48,8 +48,8 @@ func GraphFile(path string, inodos []int, dd, file int, part *disco.Montada) str
 			nombre += "inodo" + strconv.Itoa(inodos[i]) + ":indirecto" + strconv.Itoa(inodos[i+1]) + " -> inodo" + strconv.Itoa(inodos[i+1]) + ":ind" + strconv.Itoa(inodos[i+1]) + ";\n"
 		}
 		dot += "}\"];\n"
-		dot += nombre
 	}
+	dot += nombre
 	return dot
 }
 

@@ -272,47 +272,6 @@ func borrarPart(c Fdisk, mbr *estructuras.MBR) estructuras.Particion {
 			return part
 		}
 	}
-	/*	if mbr.Particiones[i].Tipo == GetChar("e") {
-				aux = mbr.Particiones[i]
-			}
-		}
-		if aux.Tipo == GetChar("e") {
-			aux.Tipo = GetChar("l")
-			var ebr estructuras.EBR
-			var ebraux estructuras.EBR
-			ebr = LeerEBR(c.Path, aux.Start)
-			ebraux = ebr
-			if name == ebr.Name {
-				ebr.Size = 0
-				ebr.Status = 0
-				copy(ebr.Name[:], "0")
-				escribirEBR(c, &ebr)
-				aux.Name = ebraux.Name
-				return aux
-			}
-			for ebr.Next != -1 && ebr.Name != name {
-				ebraux = ebr
-				ebr = LeerEBR(c.Path, ebr.Next)
-			}
-			if name == ebr.Name {
-				ebraux.Next = ebr.Next
-				var escrito estructuras.EBR
-				escrito.Next = 0
-				f, err := os.OpenFile(c.Path, os.O_RDWR, 0755) //leer o escribir
-				if err != nil {
-					log.Fatal(err)
-				}
-				f.Seek(int64(ebr.Start), 0)
-				var ebrb bytes.Buffer
-				binary.Write(&ebrb, binary.BigEndian, &escrito)
-				EscribirBytes(f, ebrb.Bytes())
-				f.Close()
-				aux.Name = ebr.Name
-				return aux
-			}
-			aux.Status = GetChar("0")
-			return aux
-		}*/
 	return aux
 }
 
