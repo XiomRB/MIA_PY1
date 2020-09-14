@@ -23,18 +23,28 @@ func RepTreeDirectory(comando Reporte) string {
 	}
 	fmt.Scanln(&op)
 	if op <= len(disco.DiscosMontados[letra].Particiones[indice].AVD) {
-		nombre = extraerStr(disco.DiscosMontados[letra].Particiones[indice].AVD[op-1].Nombre)
-		if len(nombre) == 0 {
-			return "Error: el directorio no existe"
-		}
-		if disco.DiscosMontados[letra].Particiones[indice].AVD[op-1].IndiceDD == -1 {
+		dot := "digraph g{\n"
+		dot += graphD(&disco.DiscosMontados[letra].Particiones[indice], op-1)
+		dot += "}"
+		if len(dot) == 12 {
 			return "La carpeta no contiene archivos"
 		}
-		dot := "digraph g{\n"
-		dot += nombre + "[shape = box];\n" + nombre + " -> detalle" + strconv.Itoa(int(disco.DiscosMontados[letra].Particiones[indice].AVD[op-1].IndiceDD)) + ";\n"
-		dot += graphDetalle(&disco.DiscosMontados[letra].Particiones[indice], int(disco.DiscosMontados[letra].Particiones[indice].AVD[op-1].IndiceDD), false)
-		dot += "}"
 		return dot
 	}
 	return "Error: la opcion es incorrecta"
+}
+
+func graphD(part *disco.Montada, c int) string {
+	nombre := extraerStr(part.AVD[c].Nombre)
+	if part.AVD[c].IndiceDD != -1 && len(nombre) > 0 {
+		dot := ""
+		dot += nombre + strconv.Itoa(c) + "[shape = box];\n" + nombre + strconv.Itoa(c) + " -> detalle" + strconv.Itoa(int(part.AVD[c].IndiceDD)) + ";\n"
+		dot += graphDetalle(part, int(part.AVD[c].IndiceDD), false)
+		if part.AVD[c].IndiceNext != -1 {
+			dot += graphD(part, int(part.AVD[c].IndiceNext))
+			dot += nombre + strconv.Itoa(c) + " -> " + nombre + strconv.Itoa(int(part.AVD[c].IndiceNext)) + " [color = purple];\n"
+		}
+		return dot
+	}
+	return ""
 }

@@ -22,6 +22,9 @@ func AdminMkFile(comando Mkfile) {
 		fmt.Println("Error: el parametro path es obligatorio")
 	} else {
 		letra, indice := EncontrarMontada(comando.Id)
+		if letra == -1 {
+			fmt.Println("Error: la particion no ha sido montada")
+		}
 		CrearArchivo(comando, &disco.DiscosMontados[letra].Particiones[indice], comando.P)
 	}
 }
@@ -243,7 +246,7 @@ func SearchCarpeta(part *disco.Montada, ruta string) int { //retorna indice de l
 	padre := 0
 	for i = 1; i < len(lista)-1; i++ {
 		indice, padre = EncontrarCarpeta(part, lista[i], indice)
-		if indice == 0 { //si no se encontro la carpeta se sale del for
+		if indice == 0 || indice == -1 { //si no se encontro la carpeta se sale del for
 			return -1
 		}
 	}
@@ -274,7 +277,7 @@ func SearchArchivo(part *disco.Montada, detalle int, nombre [20]byte) (int, int)
 		}
 	}
 	if part.DD[detalle].Next != -1 {
-		dd, indiceFile = SearchArchivo(part, int(part.DD[dd].Next), nombre)
+		dd, indiceFile = SearchArchivo(part, int(part.DD[detalle].Next), nombre)
 	}
 	return dd, indiceFile
 }

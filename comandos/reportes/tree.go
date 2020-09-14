@@ -30,7 +30,7 @@ func graphDirectorio(part *disco.Montada) string {
 				}
 			}
 			if part.AVD[i].IndiceNext != -1 {
-				dot += "carpeta" + strconv.Itoa(i) + " -> carpeta" + strconv.Itoa(int(part.AVD[i].IndiceNext)) + " [color=pink];\n"
+				dot += "carpeta" + strconv.Itoa(i) + " -> carpeta" + strconv.Itoa(int(part.AVD[i].IndiceNext)) + " [color=purple];\n"
 			}
 			if part.AVD[i].IndiceDD != -1 {
 				dot += "carpeta" + strconv.Itoa(i) + " -> detalle" + strconv.Itoa(int(part.AVD[i].IndiceDD)) + ";\n"
@@ -61,7 +61,7 @@ func graphDetalle(part *disco.Montada, det int, direc bool) string {
 	}
 	if part.DD[det].Next != -1 {
 		dot += " | <indirect>Detalle" + strconv.Itoa(int(part.DD[det].Next)) + "}\"];\n"
-		dot += "detalle" + strconv.Itoa(det) + ":indirect -> " + "detalle" + strconv.Itoa(int(part.DD[det].Next)) + " [color=gray];\n"
+		dot += "detalle" + strconv.Itoa(det) + ":indirect -> " + "detalle" + strconv.Itoa(int(part.DD[det].Next)) + " [color=green];\n"
 		dot += inodo
 		dot += graphDetalle(part, int(part.DD[det].Next), direc)
 	} else {
@@ -84,7 +84,7 @@ func graphInodo(part *disco.Montada, ind int) string {
 	}
 	if part.Inodos[ind].Indirecto != -1 {
 		dot += " | <indirecto" + strconv.Itoa(int(part.Inodos[ind].Indirecto)) + ">Indirecto " + strconv.Itoa(int(part.Inodos[ind].Indirecto)) + "}\"];\n"
-		contenido += "inodo" + strconv.Itoa(ind) + ":indirecto" + strconv.Itoa(int(part.Inodos[ind].Indirecto)) + " -> inodo" + strconv.Itoa(int(part.Inodos[ind].Indirecto)) + ":ind" + strconv.Itoa(int(part.Inodos[ind].Indirecto)) + " [color=lightblue];\n"
+		contenido += "inodo" + strconv.Itoa(ind) + ":indirecto" + strconv.Itoa(int(part.Inodos[ind].Indirecto)) + " -> inodo" + strconv.Itoa(int(part.Inodos[ind].Indirecto)) + ":ind" + strconv.Itoa(int(part.Inodos[ind].Indirecto)) + " [color=blue];\n"
 		dot += contenido
 		dot += graphInodo(part, int(part.Inodos[ind].Indirecto))
 	} else {

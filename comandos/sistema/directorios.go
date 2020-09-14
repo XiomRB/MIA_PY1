@@ -196,6 +196,9 @@ func EncontrarCarpeta(particion *disco.Montada, nombre string, indice int) (int,
 	copy(name[:], nombre)
 	index := 0
 	padre := indice
+	if indice == -1 {
+		return -1, -1
+	}
 	for i := 0; i < 6; i++ {
 		index = int(particion.AVD[indice].IndicesSubs[i])
 		if index != -1 {

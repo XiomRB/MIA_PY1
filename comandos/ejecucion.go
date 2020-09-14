@@ -167,9 +167,19 @@ func leerComando(raiz analizador.Nodo) {
 		}
 		sistema.AdminMkFile(mkfile)
 	case "CAT":
+		cat := sistema.Cat{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarCat(raiz.Hijos[i], &cat)
+		}
+		sistema.AdminCat(cat)
 	case "RM":
 	case "EDIT":
 	case "REN":
+		ren := sistema.Ren{}
+		for i := 0; i < len(raiz.Hijos); i++ {
+			validarRen(raiz.Hijos[i], &ren)
+		}
+		sistema.AdminRen(ren)
 	case "MKDIR":
 		mkdir := sistema.Mkdir{}
 		for i := 0; i < len(raiz.Hijos); i++ {
@@ -403,5 +413,25 @@ func validarMkfile(raiz analizador.Nodo, mkfile *sistema.Mkfile) {
 		mkfile.Size = int64(s)
 	case "cont":
 		mkfile.Cont = raiz.Hijos[0].Dato
+	}
+}
+
+func validarRen(raiz analizador.Nodo, ren *sistema.Ren) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		ren.Id = raiz.Hijos[0].Dato
+	case "path":
+		ren.Path = raiz.Hijos[0].Dato
+	case "name":
+		ren.Name = raiz.Hijos[0].Dato
+	}
+}
+
+func validarCat(raiz analizador.Nodo, cat *sistema.Cat) {
+	switch strings.ToLower(raiz.Dato) {
+	case "id":
+		cat.Id = raiz.Hijos[0].Dato
+	case "file1":
+		cat.File = raiz.Hijos[0].Dato
 	}
 }

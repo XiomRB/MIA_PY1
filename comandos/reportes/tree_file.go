@@ -45,7 +45,7 @@ func GraphFile(path string, inodos []int, dd, file int, part *disco.Montada) str
 		}
 		if i < len(inodos)-1 {
 			dot += " | <indirecto" + strconv.Itoa(inodos[i+1]) + ">Indirecto " + strconv.Itoa(inodos[i+1])
-			nombre += "inodo" + strconv.Itoa(inodos[i]) + ":indirecto" + strconv.Itoa(inodos[i+1]) + " -> inodo" + strconv.Itoa(inodos[i+1]) + ":ind" + strconv.Itoa(inodos[i+1]) + ";\n"
+			nombre += "inodo" + strconv.Itoa(inodos[i]) + ":indirecto" + strconv.Itoa(inodos[i+1]) + " -> inodo" + strconv.Itoa(inodos[i+1]) + ":ind" + strconv.Itoa(inodos[i+1]) + " [color = blue];\n"
 		}
 		dot += "}\"];\n"
 	}

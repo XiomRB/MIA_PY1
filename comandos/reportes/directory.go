@@ -29,10 +29,10 @@ func GraphArbol(arbol []estructuras.AVD) string {
 				}
 			}
 			if arbol[i].IndiceNext != -1 {
-				dot += strconv.Itoa(i) + " -> " + strconv.Itoa(int(arbol[i].IndiceNext))
-				if arbol[i].Nombre == arbol[arbol[i].IndiceNext].Nombre {
+				dot += strconv.Itoa(i) + " -> " + strconv.Itoa(int(arbol[i].IndiceNext)) + "[color = purple];\n"
+				/*	if arbol[i].Nombre == arbol[arbol[i].IndiceNext].Nombre {
 					dot += "{rank = same " + strconv.Itoa(i) + " " + strconv.Itoa(int(arbol[i].IndiceNext)) + " }\n"
-				}
+				}*/
 			}
 		}
 	}

@@ -1,97 +1,30 @@
 digraph g{
-carpeta0 [shape = box label="/"];
-carpeta0 -> carpeta1;
-carpeta0 -> carpeta12;
-carpeta0 -> carpeta17;
-carpeta0 -> detalle0;
-detalle0 [shape = record label = "{Detalle 0 | <archdet00> users.txt |  |  |  | }"];
-detalle0:archdet00 -> inodo0;
-inodo0 [shape = record label = "{<ind0>Inodo 0 |  <inbb0>Bloque 0 |  <inbb1>Bloque 1 |  | }"];
-bb0 [ shape = box label = "1,G,root
-,1,U,root,201500"];
-inodo0:inbb0 -> bb0;
-bb1 [ shape = box label = "332
-"];
-inodo0:inbb1 -> bb1;
-carpeta1 [shape = box label="ruteando"];
-carpeta1 -> carpeta2;
-carpeta1 -> carpeta3;
-carpeta1 -> carpeta4;
-carpeta1 -> carpeta5;
-carpeta1 -> carpeta6;
-carpeta1 -> carpeta7;
-carpeta1 -> carpeta8 [color=pink];
-carpeta2 [shape = box label="comandos"];
-carpeta3 [shape = box label="comandos1"];
-carpeta4 [shape = box label="comandos2"];
-carpeta5 [shape = box label="comandos3"];
-carpeta6 [shape = box label="comandos4"];
-carpeta7 [shape = box label="comandos5"];
-carpeta8 [shape = box label="ruteando"];
-carpeta8 -> carpeta9;
-carpeta8 -> carpeta10;
-carpeta8 -> carpeta11;
-carpeta9 [shape = box label="comandos6"];
-carpeta10 [shape = box label="comandos7"];
-carpeta11 [shape = box label="comandos8"];
-carpeta12 [shape = box label="home"];
-carpeta12 -> carpeta13;
-carpeta13 [shape = box label="usuarios"];
-carpeta13 -> carpeta14;
-carpeta14 [shape = box label="root"];
-carpeta14 -> carpeta15;
-carpeta14 -> detalle2;
-detalle2 [shape = record label = "{Detalle 2 | <archdet20> abece_dario.txt |  |  |  | }"];
-detalle2:archdet20 -> inodo2;
-inodo2 [shape = record label = "{<ind2>Inodo 2 |  <inbb3>Bloque 3 |  <inbb4>Bloque 4 |  <inbb5>Bloque 5 |  <inbb6>Bloque 6 | <indirecto3>Indirecto 3}"];
-bb3 [ shape = box label = "abcdefghijklmnopqrstuvwxy"];
-inodo2:inbb3 -> bb3;
-bb4 [ shape = box label = "zabcdefghijklmnopqrstuvwx"];
-inodo2:inbb4 -> bb4;
-bb5 [ shape = box label = "yzabcdefghijklmnopqrstuvw"];
-inodo2:inbb5 -> bb5;
-bb6 [ shape = box label = "xyzabcdefghijklmnopqrstuv"];
-inodo2:inbb6 -> bb6;
-inodo2:indirecto3 -> inodo3:ind3 [color=lightblue];
-inodo3 [shape = record label = "{<ind3>Inodo 3 |  <inbb7>Bloque 7 |  |  | }"];
-bb7 [ shape = box label = "wxyzabcdefghijklmnopqrs"];
-inodo3:inbb7 -> bb7;
-carpeta15 [shape = box label="otro"];
-carpeta15 -> carpeta16;
-carpeta16 [shape = box label="on"];
-carpeta16 -> detalle1;
-detalle1 [shape = record label = "{Detalle 1 | <archdet10> abec_edario.txt |  |  |  | }"];
-detalle1:archdet10 -> inodo1;
-inodo1 [shape = record label = "{<ind1>Inodo 1 |  <inbb2>Bloque 2 |  |  | }"];
-bb2 [ shape = box label = "abcdefghijklmnopqrstuvwxy"];
-inodo1:inbb2 -> bb2;
-carpeta17 [shape = box label="ust"];
-carpeta17 -> carpeta18;
-carpeta17 -> carpeta20;
-carpeta18 [shape = box label="ert"];
-carpeta18 -> carpeta19;
-carpeta19 [shape = box label="a"];
-carpeta19 -> detalle3;
-detalle3 [shape = record label = "{Detalle 3 | <archdet30> e.txt |  |  |  | }"];
-detalle3:archdet30 -> inodo4;
-inodo4 [shape = record label = "{<ind4>Inodo 4 |  <inbb8>Bloque 8 |  <inbb9>Bloque 9 |  <inbb10>Bloque 10 | }"];
-bb8 [ shape = box label = "abcdefghijklmnopqrstuvwxy"];
-inodo4:inbb8 -> bb8;
-bb9 [ shape = box label = "zabcdefghijklmnopqrstuvwx"];
-inodo4:inbb9 -> bb9;
-bb10 [ shape = box label = "yzabc"];
-inodo4:inbb10 -> bb10;
-carpeta20 [shape = box label="usuarios"];
-carpeta20 -> carpeta21;
-carpeta21 [shape = box label="201500332"];
-carpeta21 -> detalle4;
-detalle4 [shape = record label = "{Detalle 4 | <archdet40> abec edario.txt |  |  |  | }"];
-detalle4:archdet40 -> inodo5;
-inodo5 [shape = record label = "{<ind5>Inodo 5 |  <inbb11>Bloque 11 |  <inbb12>Bloque 12 |  <inbb13>Bloque 13 | }"];
-bb11 [ shape = box label = "abcdefghijklmnopqrstuvwxy"];
-inodo5:inbb11 -> bb11;
-bb12 [ shape = box label = "zabcdefghijklmnopqrstuvwx"];
-inodo5:inbb12 -> bb12;
-bb13 [ shape = box label = "yzabcdefghijklmnopqr"];
-inodo5:inbb13 -> bb13;
+node [shape = box];
+0 [label = "/"]
+0 -> 1
+1 [label = "home"]
+1 -> 2
+1 -> 5
+2 [label = "user"]
+2 -> 3
+3 [label = "modificada"]
+3 -> 4
+4 [label = "r"]
+5 [label = "discos"]
+5 -> 6
+5 -> 7
+5 -> 8
+5 -> 9
+5 -> 10
+5 -> 11
+5 -> 12[color = purple];
+6 [label = "1"]
+7 [label = "2"]
+8 [label = "3"]
+9 [label = "4"]
+10 [label = "5"]
+11 [label = "6"]
+12 [label = "discos"]
+12 -> 13
+13 [label = "7"]
 }
