@@ -16,7 +16,7 @@ func main() {
 	entrada, _ := reader.ReadString('\n')
 	var path string
 	path = string(entrada)
-	for len(path) > 5 {
+	for path != "exit\n" {
 		comandos.Ejecutar(path)
 		fmt.Println("\nIntroduzca un comando:")
 		entrada, _ := reader.ReadString('\n')

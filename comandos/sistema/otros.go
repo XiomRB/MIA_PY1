@@ -106,6 +106,9 @@ func reportarCat(part *disco.Montada, arch string) {
 		return
 	}
 	var inodos []int
+	if part.DD[detalle].Files[file].Inodo != -1 {
+		inodos = append(inodos, int(part.DD[detalle].Files[file].Inodo))
+	}
 	inodos = SearchInodos(part, inodos, int(part.DD[detalle].Files[file].Inodo))
 	if len(inodos) == 0 {
 		fmt.Println("El archivo no contiene texto")
